@@ -1,0 +1,141 @@
+package description;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class description extends JPanel implements ActionListener {
+
+    private Timer timer;
+    private JButton backButton;
+    private JFrame frame;
+    private JLabel titleLabel;
+    private JTextArea textArea;
+    private JScrollPane scrollPane;
+
+    public description(JFrame frame) {
+        this.frame = frame;
+        setLayout(null);
+        setBackground(Color.BLACK);
+
+        // BACK BUTTON — temporary action since no TitlePanel
+        backButton = new JButton("BACK");
+        backButton.setFont(new Font("Monospaced", Font.BOLD, 20));
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        backButton.setBounds(30, 30, 100, 40);
+        add(backButton);
+
+        // For standalone version, make BACK close the window
+        backButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Going back to main menu (placeholder)");
+            frame.dispose(); // Close window
+        });
+
+        
+        titleLabel = new JLabel("HOW TO PLAY", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Monospaced", Font.BOLD, 40));
+        titleLabel.setForeground(Color.WHITE);
+        add(titleLabel);
+
+        
+        textArea = new JTextArea(
+            "C.O.U.R.S.E\n\n" +
+            "College Unified Role Playing Students Encounter\n\n" +
+            "DESCRIPTION\n\n" +
+            "A role-playing game where each course is represented by a student with unique skills, " +
+            "abilities, and personalities that mirror their field of study. Join their adventure as " +
+            "they face challenges in the world of college and battle their way through every semester.\n\n" +
+            "CHARACTERS\n\n" +
+            "Char 1: Dorothy (ARCHITECT) — HIGHEST DEFENSE\n" +
+            "Skill 1: T SQUARE – Uses a T square for offense.\n" +
+            "Skill 2: COMPASS – Creates a shield lasting 2 turns.\n" +
+            "Skill 3 (ULTIMATE): SUCCESSFUL FLOOR PLAN – Summons a protective barrier.\n\n" +
+            "Char 2: Quinn (NURSING) — HIGHEST HP\n" +
+            "Skill 1: FIRST AID KIT – Heals a single ally.\n" +
+            "Skill 2: SPRAY BOTTLE – Heals or poisons enemies.\n" +
+            "Skill 3 (ULTIMATE): SYRINGE REVIVE – Revives a downed ally.\n\n" +
+            "Char 3: Noah (I.T.) — HIGHEST SPEED\n" +
+            "Skill 1: CELLPHONE – Fires electric byte strikes.\n" +
+            "Skill 2: CALL VIRUS – Summons a virus entity.\n" +
+            "Skill 3 (ULTIMATE): TRANSFORMATION – Boosts armor and power.\n\n" +
+            "Char 4: Darwin (ENGINEERING) — HIGHEST INTELLECT\n" +
+            "Skill 1: SURVEY CAMERA – Reveals enemy weak points.\n" +
+            "Skill 2: HEAVY CALCULATIONS – Predicts the next enemy move.\n" +
+            "Skill 3 (ULTIMATE): HARD HATS – Provides safety gear to boost party defense.\n\n" +
+            "Char 5: Ace (PSYCHOLOGY) — HIGHEST WISDOM\n" +
+            "Skill 1: PSYCHOLOGY BOOK – Confuses enemies with knowledge.\n" +
+            "Skill 2: UNO REVERSE CARD – Reflects enemy attacks with amplified damage.\n" +
+            "Skill 3 (ULTIMATE): EXISTENTIAL CRISIS – Inflicts confusion for 4 turns.\n\n"
+        );
+
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        textArea.setForeground(Color.WHITE);
+        textArea.setBackground(Color.BLACK);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+        add(scrollPane);
+
+        
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                centerContent();
+            }
+        });
+
+        
+        timer = new Timer(100, this);
+        timer.start();
+    }
+
+    private void centerContent() {
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+
+        int textWidth = panelWidth - 200;
+        int textHeight = panelHeight - 200;
+
+        titleLabel.setBounds(0, 100, panelWidth, 50);
+        scrollPane.setBounds((panelWidth - textWidth) / 2, 180, textWidth, textHeight);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.WHITE);
+
+        
+        for (int i = 0; i < 150; i++) {
+            int x = (int) (Math.random() * getWidth());
+            int y = (int) (Math.random() * getHeight());
+            g.fillRect(x, y, 2, 2);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        repaint(); 
+    }
+
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("C.O.U.R.S.E - How To Play");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1000, 700);
+            frame.setLocationRelativeTo(null);
+            frame.setResizable(true);
+
+            description panel = new description(frame);
+            frame.setContentPane(panel);
+            frame.setVisible(true);
+        });
+    }
+}

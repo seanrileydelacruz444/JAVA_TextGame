@@ -1,0 +1,255 @@
+package title;
+ 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+ 
+public class GUI {
+ 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GUI().createAndShowGUI());
+    }
+ 
+    public void createAndShowGUI() {
+        // Main frame setup
+        JFrame frame = new JFrame("NEBULA");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(900, 600);
+        frame.setLocationRelativeTo(null);
+ 
+        TitlePanel panel = new TitlePanel(frame);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+    }
+ 
+    // === TITLE PAGE ===
+    class TitlePanel extends JPanel implements ActionListener {
+ 
+        private Timer timer;
+        private JButton startButton, howToPlayButton, quitButton;
+        private JFrame frame;
+ 
+        public TitlePanel(JFrame frame) {
+            this.frame = frame;
+            setLayout(null);
+            setBackground(Color.BLACK);
+ 
+            // buttons sa title page
+            startButton = createButton("START");
+            howToPlayButton = createButton("HOW TO PLAY");
+            quitButton = createButton("QUIT");
+ 
+            add(startButton);
+            add(howToPlayButton);
+            add(quitButton);
+ 
+            // Kung mo-resize ang window, automatic re-center sa mga buttons
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    centerComponents();
+                }
+            });
+ 
+            // Button actions para ika click mo lahus sa next action
+            startButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "Starting...")); //SEAN IKAW LAN BAHALA SUMPAY ARI SA GAMEE SA START BUTTON :)
+            howToPlayButton.addActionListener(e -> goToHowToPlayPage());
+            quitButton.addActionListener(e -> System.exit(0));
+ 
+            // Timer para i-refresh ang mga starts para mo sidlak sidlak sila
+            timer = new Timer(100, this);
+            timer.start();
+        }
+ 
+        private JButton createButton(String text) {
+            // Method para create ug uniform and neat ang style sa mga buttons para same sila tanan
+            JButton button = new JButton(text);
+            button.setFocusPainted(false);
+            button.setFont(new Font("Monospaced", Font.BOLD, 30));
+            button.setBackground(Color.BLACK);
+            button.setForeground(Color.WHITE);
+            button.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            button.setSize(300, 60);
+            return button;
+        }
+ 
+        private void centerComponents() {
+            // Function para i-center ang mga buttons sa tunga
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+ 
+            int buttonWidth = startButton.getWidth();
+            int x = (panelWidth - buttonWidth) / 2;
+            int yStart = (panelHeight - 200) / 2;
+ 
+            startButton.setLocation(x, yStart);
+            howToPlayButton.setLocation(x, yStart + 80);
+            quitButton.setLocation(x, yStart + 160);
+        }
+ 
+        private void goToHowToPlayPage() {
+            // Kung i-click ang “How to Play” mo-move to next page which is naa didtu mga info sa duwa :)
+            HowToPlayPanel nextPage = new HowToPlayPanel(frame);
+            frame.setContentPane(nextPage);
+            frame.revalidate();
+            frame.repaint();
+            nextPage.requestFocusInWindow();
+        }
+ 
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+ 
+            // Drawing sa mga bituon sa background pattern
+            for (int i = 0; i < 150; i++) {
+                int x = (int) (Math.random() * getWidth());
+                int y = (int) (Math.random() * getHeight());
+                g.fillRect(x, y, 2, 2);
+            }
+ 
+            // Drawing sa title text and mga fonts niya
+            g.setFont(new Font("Monospaced", Font.BOLD, 100));
+            FontMetrics fm = g.getFontMetrics();
+            String title = "C.O.U.R.S.E";
+            int x = (getWidth() - fm.stringWidth(title)) / 2;
+            int y = 150;
+            g.drawString(title, x, y);
+ 
+            centerComponents();
+        }
+ 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            repaint(); // Para mu-refresh ang stars animation
+        }
+    }
+ 
+    // === HOW TO PLAY PAGE ===
+    class HowToPlayPanel extends JPanel implements ActionListener {
+ 
+        private Timer timer;
+        private JButton backButton;
+        private JFrame frame;
+        private JLabel titleLabel;
+        private JTextArea textArea;
+        private JScrollPane scrollPane;
+ 
+        public HowToPlayPanel(JFrame frame) {
+            this.frame = frame;
+            setLayout(null);
+            setBackground(Color.BLACK);
+ 
+            // BACK BUTTON — mobalik sa main menu or sa main page or title screen
+            backButton = new JButton("BACK");
+            backButton.setFont(new Font("Monospaced", Font.BOLD, 20));
+            backButton.setBackground(Color.BLACK);
+            backButton.setForeground(Color.WHITE);
+            backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            backButton.setBounds(30, 30, 100, 40);
+            add(backButton);
+ 
+            backButton.addActionListener(e -> {
+                TitlePanel mainPage = new TitlePanel(frame);
+                frame.setContentPane(mainPage);
+                frame.revalidate();
+                frame.repaint();
+                mainPage.requestFocusInWindow();
+            });
+ 
+            // Title label sa ibabaw
+            titleLabel = new JLabel("HOW TO PLAY", SwingConstants.CENTER);
+            titleLabel.setFont(new Font("Monospaced", Font.BOLD, 40));
+            titleLabel.setForeground(Color.WHITE);
+            add(titleLabel);
+ 
+            // Text area para sa full game info ug description
+            textArea = new JTextArea(
+                "C.O.U.R.S.E\n\n" +
+                "College Unified Role Playing Students Encounter\n\n" +
+                "DESCRIPTION\n\n" +
+                "A role-playing game where each course is represented by a student with unique skills, " +
+                "abilities, and personalities that mirror their field of study. Join their adventure as " +
+                "they face challenges in the world of college and battle their way through every semester.\n\n" +
+                "CHARACTERS\n\n" +
+                "Char 1: Dorothy (ARCHITECT) — HIGHEST DEFENSE\n" +
+                "Skill 1: T SQUARE – Uses a T square for offense.\n" +
+                "Skill 2: COMPASS – Creates a shield lasting 2 turns.\n" +
+                "Skill 3 (ULTIMATE): SUCCESSFUL FLOOR PLAN – Summons a protective barrier.\n\n" +
+                "Char 2: Quinn (NURSING) — HIGHEST HP\n" +
+                "Skill 1: FIRST AID KIT – Heals a single ally.\n" +
+                "Skill 2: SPRAY BOTTLE – Heals or poisons enemies.\n" +
+                "Skill 3 (ULTIMATE): SYRINGE REVIVE – Revives a downed ally.\n\n" +
+                "Char 3: Noah (I.T.) — HIGHEST SPEED\n" +
+                "Skill 1: CELLPHONE – Fires electric byte strikes.\n" +
+                "Skill 2: CALL VIRUS – Summons a virus entity.\n" +
+                "Skill 3 (ULTIMATE): TRANSFORMATION – Boosts armor and power.\n\n" +
+                "Char 4: Darwin (ENGINEERING) — HIGHEST INTELLECT\n" +
+                "Skill 1: SURVEY CAMERA – Reveals enemy weak points.\n" +
+                "Skill 2: HEAVY CALCULATIONS – Predicts the next enemy move.\n" +
+                "Skill 3 (ULTIMATE): HARD HATS – Provides safety gear to boost party defense.\n\n" +
+                "Char 5: Ace (PSYCHOLOGY) — HIGHEST WISDOM\n" +
+                "Skill 1: PSYCHOLOGY BOOK – Confuses enemies with knowledge.\n" +
+                "Skill 2: UNO REVERSE CARD – Reflects enemy attacks with amplified damage.\n" +
+                "Skill 3 (ULTIMATE): EXISTENTIAL CRISIS – Inflicts confusion for 4 turns.\n\n"
+            );
+ 
+            // Text styling
+            textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+            textArea.setForeground(Color.WHITE);
+            textArea.setBackground(Color.BLACK);
+            textArea.setEditable(false);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+ 
+            // Scroll pane para makita tanan text kung taas or sa ubos
+            scrollPane = new JScrollPane(textArea);
+            scrollPane.setBorder(null);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+            add(scrollPane);
+ 
+            // Kung i-resize ang window, mu-center gihapon ang content para kuan ba murag mobile view dimaguba format
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    centerContent();
+                }
+            });
+ 
+            // Timer para sa star animation para mo sidlak
+            timer = new Timer(100, this);
+            timer.start();
+        }
+ 
+        private void centerContent() {
+            // Ibutang sa tunga ang title ug text area dynamically
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+ 
+            int textWidth = panelWidth - 200;
+            int textHeight = panelHeight - 200;
+ 
+            titleLabel.setBounds(0, 100, panelWidth, 50);
+            scrollPane.setBounds((panelWidth - textWidth) / 2, 180, textWidth, textHeight);
+        }
+ 
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+ 
+            // Background stars
+            for (int i = 0; i < 150; i++) {
+                int x = (int) (Math.random() * getWidth());
+                int y = (int) (Math.random() * getHeight());
+                g.fillRect(x, y, 2, 2);
+            }
+        }
+ 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            repaint(); // I-refresh para mu-glow ang mga bituon
+        }
+    }
+}
+ 

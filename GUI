@@ -1,28 +1,197 @@
-package title;
- 
+package game;
+
+import game.Characters;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
- 
+
 public class GUI {
- 
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> new GUI().createAndShowGUI());
-	}
 
-	public void createAndShowGUI() {
-		JFrame frame = new JFrame();
-		frame.setSize(900, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setBackground(Color.black);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GUI    ().createAndShowGUI());
+    }
 
-		TitlePanel panel = new TitlePanel(frame);
-		frame.setLocationRelativeTo(null);
-		frame.setContentPane(panel);
-		frame.setVisible(true);
-	}
+    public void createAndShowGUI() {
+        JFrame frame = new JFrame();
+        frame.setSize(900, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setBackground(Color.black);
 
-	// === TITLE PAGE ===
+        TitlePanel panel = new TitlePanel(frame);
+        frame.setLocationRelativeTo(null);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+
+        Characters Dorothy, Quinn, Noah, Ace, Darwin;
+        Dorothy = new Characters("Dorothy");
+        Quinn = new Characters("Quinn");
+        Noah = new Characters("Noah");
+        Ace = new Characters("Ace");
+        Darwin = new Characters("Darwin");
+
+        System.out.println(Dorothy.useSkill(1));
+        System.out.println(Dorothy.useSkill(2));
+        System.out.println(Dorothy.useSkill(3));
+
+    }
+
+    // == LOADING PANEL ==
+    class LoadingPanel extends JPanel implements ActionListener {
+        private Timer timer;
+        private Timer progressTimer;
+        private JFrame frame;
+        private int progress = 0;
+        private int angle = 0;
+
+        public LoadingPanel(JFrame frame) {
+            this.frame = frame;
+            setLayout(null);
+            setBackground(Color.BLACK);
+        }
+
+        public void startLoading() {
+            timer = new Timer(50, e -> {
+                angle = (angle + 5) % 360;
+                repaint();
+            });
+            timer.start();
+
+            progressTimer = new Timer(100, this);
+            progressTimer.start();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+
+            for (int i = 0; i < 150; i++) {
+                int x = (int) (Math.random() * getWidth());
+                int y = (int) (Math.random() * getHeight());
+                g.fillRect(x, y, 2, 2);
+            }
+
+            drawLoadingWheel(g);
+
+            g.setFont(new Font("Monospaced", Font.BOLD, 30));
+            String loadingText = "Starting the semester... " + progress + "%";
+            int textWidth = g.getFontMetrics().stringWidth(loadingText);
+            int textX = (getWidth() - textWidth) / 2;
+            int textY = getHeight() / 2 + 100;
+            g.drawString(loadingText, textX, textY);
+
+
+            int barWidth = 300;
+            int barHeight = 20;
+            int barX = (getWidth() - barWidth) / 2;
+            int barY = getHeight() / 2 + 150;
+
+            g.drawRect(barX, barY, barWidth, barHeight);
+            g.fillRect(barX, barY, (barWidth * progress) / 100, barHeight);
+        }
+
+        private void drawLoadingWheel(Graphics g) {
+            int width = getWidth();
+            int height = getHeight();
+            int wheelSize = Math.min(width, height) / 3;
+            int x = width / 2 - wheelSize / 2;
+            int y = height / 3 - wheelSize / 2;
+
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setColor(Color.WHITE);
+            g2d.setStroke(new BasicStroke(3f));
+
+            int outerDiameter = wheelSize;
+            int innerDiameter = (int)(wheelSize * 0.8);
+            int outerRadius = outerDiameter / 2;
+            int innerRadius = innerDiameter / 2;
+
+            int centerX = x + outerRadius;
+            int centerY = y + outerRadius;
+
+            for(int i = 0; i < 12; i++) {
+                double startAngle = Math.toRadians(i * 30 - angle);
+                double endAngle = Math.toRadians(i * 30 + 60 - angle);
+
+                int startX = (int) (centerX + outerRadius * Math.cos(startAngle));
+                int startY = (int) (centerY + outerRadius * Math.sin(startAngle));
+                int endX = (int) (centerX + innerRadius * Math.cos(endAngle));
+                int endY = (int) (centerY + innerRadius * Math.sin(endAngle));
+
+                g2d.drawLine(startX, startY, endX, endY);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            progress += 3;
+
+            if (progress >= 100) {
+                timer.stop();
+                progressTimer.stop();
+
+                // Transition sa next panel para mag start na ang game
+                GameStart gamePanel = new GameStart(frame);// charchar ra ang gamescene, ilisan og actual name sa class
+                frame.setContentPane(gamePanel);
+                frame.revalidate();
+                frame.repaint();
+            }
+
+            repaint();
+        }
+
+    }
+
+    // === START GAME ===
+    class GameStart extends JPanel {
+        private JFrame frame;
+        private JButton backButton;
+
+        public GameStart(JFrame frame) {
+            this.frame = frame;
+            setLayout(null);
+            setBackground(Color.BLACK);
+
+            // Balik sa main nga screen
+            backButton = new JButton("BACK TO MENU");
+            backButton.setFont(new Font("Monospaced", Font.BOLD, 20));
+            backButton.setBackground(Color.BLACK);
+            backButton.setForeground(Color.WHITE);
+            backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            backButton.setBounds(30,    30, 200, 40);
+            add(backButton);
+
+            backButton.addActionListener(e -> {
+                TitlePanel mainPage = new TitlePanel(frame);
+                frame.setContentPane(mainPage);
+                frame.revalidate();
+                frame.repaint();
+            });
+
+
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+
+            for (int i = 0; i < 150; i++) {
+                int x = (int) (Math.random() * getWidth());
+                int y = (int) (Math.random() * getHeight());
+                g.fillRect(x, y, 2, 2);
+            }
+
+            g.setFont(new Font("Monospaced", Font.BOLD, 40));
+            g.drawString("WAWAWAW STart na", 250, 300);
+        }
+    }
+
+
+
+
+    // === TITLE PAGE ===
     class TitlePanel extends JPanel implements ActionListener {
 
         private Timer timer;
@@ -52,7 +221,16 @@ public class GUI {
             });
 
             // Button actions para ika click mo lahus sa next action
-            startButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "Starting...")); //SEAN IKAW LAN BAHALA SUMPAY ARI SA GAMEE SA START BUTTON :)
+            //Ge change nako(Tiro) kay para makita ang loading chuchu
+            startButton.addActionListener(e -> {
+
+                LoadingPanel loadingPanel = new LoadingPanel(frame);
+                frame.setContentPane(loadingPanel);
+                frame.revalidate();
+                frame.repaint();
+                loadingPanel.startLoading();
+            });
+            //SEAN IKAW LAN BAHALA SUMPAY ARI SA GAMEE SA START BUTTON 🙂
             howToPlayButton.addActionListener(e -> goToHowToPlayPage());
             quitButton.addActionListener(e -> System.exit(0));
 
@@ -88,7 +266,7 @@ public class GUI {
         }
 
         private void goToHowToPlayPage() {
-            // Kung i-click ang “How to Play” mo-move to next page which is naa didtu mga info sa duwa :)
+            // Kung i-click ang “How to Play” mo-move to next page which is naa didtu mga info sa duwa 🙂
             HowToPlayPanel nextPage = new HowToPlayPanel(frame);
             frame.setContentPane(nextPage);
             frame.revalidate();

@@ -1,14 +1,102 @@
 package game;
 
-import game.Characters;
+import game.Character.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLSyntaxErrorException;
+import java.util.Scanner;
 
 public class GUI {
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Character chosenCharacter = null;
         SwingUtilities.invokeLater(() -> new GUI    ().createAndShowGUI());
+
+        //TERMINAL DEMO
+        int num;
+        System.out.println("----- | Choose a character! |----- ");
+        System.out.println("1. Dorothy\t\tSkill : Floor Plan");
+        System.out.println("2. Quinn\t\tSkill : First Aid Kit");
+        System.out.println("3. Noah   \t\tSkill : Transformation");
+        System.out.println("4. Darwin\t\tSkill : Hard Hats");
+        System.out.println("5. Ace   \t\tSkill : Existential Crisis");
+        System.out.print("What will it be? ");
+        num  = scanner.nextInt();
+
+        if(num == 1) {
+            chosenCharacter = new Dorothy();
+        }
+        else if(num == 2) {
+            chosenCharacter = new Quinn();
+        }
+        else if(num == 3) {
+            chosenCharacter = new Noah();
+        }
+        else if(num == 4) {
+            chosenCharacter = new Darwin();
+        }
+        else if(num == 5) {
+            chosenCharacter = new Ace();
+        }
+        else{
+            System.out.println("Invalid input! There's no character there silly!");
+        }
+        System.out.println("3..");
+        System.out.println(" ");
+        System.out.println("2...");
+        System.out.println(" ");
+        System.out.println("1....");
+        System.out.println(" ");
+        System.out.println("-------- | BATTLE BEGIN! |-------- ");
+
+        Skill Attack = new Skill.Attack();
+        Monster Monster = new Monster();
+        int Round = 1;
+
+        do{
+
+            System.out.println("-------- | Round " + Round + " ! |-------- ");
+            System.out.println(chosenCharacter.name + "\t HP: " + chosenCharacter.HP + " MP: " + chosenCharacter.MP);
+            System.out.println(Monster.name + "\t HP: " + Monster.HP + " MP: " + Monster.MP);
+
+            int decision;
+            System.out.println("1. Attack");
+            System.out.println("2. Use Skill");
+            System.out.print("What would you like to do? ");
+            decision = scanner.nextInt();
+
+            switch(decision) {
+                case 1:
+                    Attack.use(chosenCharacter, Monster);
+                    break;
+                case 2:
+                    chosenCharacter.UltimateSkill.use(chosenCharacter, Monster);
+                    break;
+                default:
+                    System.out.println("Make a proper decision!");
+            }
+
+            if(Monster.HP == 0){
+                System.out.println(".");
+                System.out.println("..");
+                System.out.println("...");
+                System.out.println("URGH!, Young Warrior... you are strong...");
+                System.out.println("THUD!");
+                System.out.println(" ");
+                System.out.println("----------- | YOU WIN | -----------");
+
+                break;
+            }
+
+            System.out.println("----------- | Monster's Turn | -----------");
+            Attack.use(Monster, chosenCharacter);
+
+            Round++;
+
+        }while(Monster.HP != 0);
     }
 
     public void createAndShowGUI() {
@@ -22,16 +110,18 @@ public class GUI {
         frame.setContentPane(panel);
         frame.setVisible(true);
 
-        Characters Dorothy, Quinn, Noah, Ace, Darwin;
-        Dorothy = new Characters("Dorothy");
-        Quinn = new Characters("Quinn");
-        Noah = new Characters("Noah");
-        Ace = new Characters("Ace");
-        Darwin = new Characters("Darwin");
+        //CHARACTER INITIALIZE
+        /*Dorothy dorothy = new Dorothy();
+        Quinn quinn = new Quinn();
+        Noah noah = new Noah();
+        Darwin darwin = new Darwin();
+        Ace ace = new Ace();
 
-        System.out.println(Dorothy.useSkill(1));
-        System.out.println(Dorothy.useSkill(2));
-        System.out.println(Dorothy.useSkill(3));
+        System.out.println(dorothy.useUltimateSkill());
+        System.out.println(quinn.useUltimateSkill());
+        System.out.println(noah.useUltimateSkill());
+        System.out.println(darwin.useUltimateSkill());
+        System.out.println(ace.useUltimateSkill());*/
 
     }
 
@@ -184,7 +274,7 @@ public class GUI {
             }
 
             g.setFont(new Font("Monospaced", Font.BOLD, 40));
-            g.drawString("WAWAWAW STart na", 250, 300);
+            g.drawString("Game Start", 300, 300);
         }
     }
 

@@ -52,6 +52,7 @@ public class Skill{
             int damage = (user.ATK * 2) - (target.DEF / 2);
             if(damage < 0) damage = 0;
             target.HP -= damage;
+            user.MP -= MPcost;
             if(target.HP < 0)  target.HP = 0;
 
             System.out.println(user.name + " used her skill against " + target.name + "!");
@@ -69,13 +70,13 @@ public class Skill{
 
         @Override
         public void use(Character user, Character target) {
-            int damage = (user.ATK * 2) - (target.DEF / 2);
-            if(damage < 0) damage = 0;
-            target.HP -= damage;
-            if(target.HP < 0)  target.HP = 0;
+            int heal = user.HP / 4;
+            target.HP += heal;
+            user.MP -= MPcost;
+            if(target.HP > target.maxHP) target.HP = target.maxHP;
 
-            System.out.println(user.name + " used her skill against " + target.name + "!");
-            System.out.println(user.name + " hit for ...." + damage + "!");
+            System.out.println(user.name + " used her heal on " + target.name + "!");
+            System.out.println(user.name + " healed for ...." + heal + "!");
             System.out.println(target.name + "HP\t:" + target.HP);
             System.out.println(" ");
             System.out.println(" ");
@@ -89,14 +90,11 @@ public class Skill{
 
         @Override
         public void use(Character user, Character target) {
-            int damage = (user.ATK * 2) - (target.DEF / 2);
-            if(damage < 0) damage = 0;
-            target.HP -= damage;
-            if(target.HP < 0)  target.HP = 0;
+            user.ATK *= 2;
+            user.DEF += 40;
+            user.MP -= MPcost;
 
-            System.out.println(user.name + " used her skill against " + target.name + "!");
-            System.out.println(user.name + " hit for ...." + damage + "!");
-            System.out.println(target.name + "HP\t:" + target.HP);
+            System.out.println(user.name + " transformed!!! infront of " + target.name + "!");
             System.out.println(" ");
             System.out.println(" ");
         }
@@ -112,6 +110,7 @@ public class Skill{
             int damage = (user.ATK * 2) - (target.DEF / 2);
             if(damage < 0) damage = 0;
             target.HP -= damage;
+            user.MP -= MPcost;
             if(target.HP < 0)  target.HP = 0;
 
             System.out.println(user.name + " used her skill against " + target.name + "!");
@@ -132,6 +131,7 @@ public class Skill{
             int damage = (user.ATK * 2) - (target.DEF / 2);
             if(damage < 0) damage = 0;
             target.HP -= damage;
+            user.MP -= MPcost;
             if(target.HP < 0)  target.HP = 0;
 
             System.out.println(user.name + " used her skill against " + target.name + "!");
@@ -141,6 +141,5 @@ public class Skill{
             System.out.println(" ");
         }
     }
-
 
 }

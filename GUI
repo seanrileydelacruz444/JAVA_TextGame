@@ -13,37 +13,64 @@ public class GUI {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Character chosenCharacter = null;
+        Character otherChosenCharacter = null;
         SwingUtilities.invokeLater(() -> new GUI    ().createAndShowGUI());
 
-        //TERMINAL DEMO
-        int num;
-        System.out.println("----- | Choose a character! |----- ");
-        System.out.println("1. Dorothy\t\tSkill : Floor Plan");
-        System.out.println("2. Quinn\t\tSkill : First Aid Kit");
-        System.out.println("3. Noah   \t\tSkill : Transformation");
-        System.out.println("4. Darwin\t\tSkill : Hard Hats");
-        System.out.println("5. Ace   \t\tSkill : Existential Crisis");
-        System.out.print("What will it be? ");
-        num  = scanner.nextInt();
+        System.out.println("----- | Choose your character! | -----");
+        System.out.println("1. Dorothy");
+        System.out.println("2. Quinn");
+        System.out.println("3. Noah");
+        System.out.println("4. Darwin");
+        System.out.println("5. Ace");
+        System.out.print("Pick your fighter: ");
+        int num = scanner.nextInt();
 
-        if(num == 1) {
-            chosenCharacter = new Dorothy();
-        }
-        else if(num == 2) {
-            chosenCharacter = new Quinn();
-        }
-        else if(num == 3) {
-            chosenCharacter = new Noah();
-        }
-        else if(num == 4) {
-            chosenCharacter = new Darwin();
-        }
-        else if(num == 5) {
-            chosenCharacter = new Ace();
-        }
-        else{
+        //TERMINAL DEMO
+        if (num == 1) chosenCharacter = new Dorothy();
+        else if (num == 2) chosenCharacter = new Quinn();
+        else if (num == 3) chosenCharacter = new Noah();
+        else if (num == 4) chosenCharacter = new Darwin();
+        else if (num == 5) chosenCharacter = new Ace();
+        else {
             System.out.println("Invalid input! There's no character there silly!");
         }
+
+        System.out.println("----- | Choose your ally! | -----");
+        System.out.print("Pick another character: ");
+        int num2 = scanner.nextInt();
+
+        if (num2 == num) {
+            System.out.println(chosenCharacter.name + " is already picked!");
+            System.out.println("Please pick a different character: ");
+            num2 = scanner.nextInt();
+        }
+
+        switch (num2) {
+            case 1 -> otherChosenCharacter = new Dorothy();
+            case 2 -> otherChosenCharacter = new Quinn();
+            case 3 -> otherChosenCharacter = new Noah();
+            case 4 -> otherChosenCharacter = new Darwin();
+            case 5 -> otherChosenCharacter = new Ace();
+            default -> System.out.println("Invalid input! There's no character there silly!");
+        }
+
+        if (otherChosenCharacter == null) {
+            System.out.println("No valid ally chosen. Game over!");
+            return;
+        }
+
+        System.out.println(chosenCharacter.name + " and " + otherChosenCharacter.name + " are picked!");
+        System.out.println(" ");
+
+
+        System.out.println("You and " + otherChosenCharacter.name + " are walking and suddenly, you hear a loud... THUD behind you.");
+        System.out.println("A soft growl you heard, and you both turn to look at it. You see a monster!!");
+        System.out.println(" ");
+
+        System.out.println("Monster: \". . . .\"");
+        System.out.println("Monster: Will you be a worthy foe..?");
+        System.out.println(" ");
+
         System.out.println("3..");
         System.out.println(" ");
         System.out.println("2...");
@@ -52,51 +79,75 @@ public class GUI {
         System.out.println(" ");
         System.out.println("-------- | BATTLE BEGIN! |-------- ");
 
-        Skill Attack = new Skill.Attack();
         Monster Monster = new Monster();
+
         int Round = 1;
 
-        do{
-
+        do {
             System.out.println("-------- | Round " + Round + " ! |-------- ");
-            System.out.println(chosenCharacter.name + "\t HP: " + chosenCharacter.HP + " MP: " + chosenCharacter.MP);
-            System.out.println(Monster.name + "\t HP: " + Monster.HP + " MP: " + Monster.MP);
+            System.out.println(chosenCharacter.name + "\t HP: " + chosenCharacter.HP + "  MP: " + chosenCharacter.MP);
+            System.out.println(otherChosenCharacter.name + "\t HP: " + otherChosenCharacter.HP + "  MP: " + otherChosenCharacter.MP);
+            System.out.println(Monster.name + "\t HP: " + Monster.HP + "  MP: " + Monster.MP);
+            System.out.println();
 
-            int decision;
-            System.out.println("1. Attack");
-            System.out.println("2. Use Skill");
-            System.out.print("What would you like to do? ");
-            decision = scanner.nextInt();
+            System.out.println("Who will take the move?");
+            System.out.println("1. " + chosenCharacter.name);
+            System.out.println("2. " + otherChosenCharacter.name);
+            System.out.print("Who will attack this turn? ");
+            int who = scanner.nextInt();
 
-            switch(decision) {
-                case 1:
-                    Attack.use(chosenCharacter, Monster);
-                    break;
-                case 2:
-                    chosenCharacter.UltimateSkill.use(chosenCharacter, Monster);
-                    break;
-                default:
-                    System.out.println("Make a proper decision!");
+            Character attacker = null;
+
+            switch(who) {
+                case 1 -> attacker = chosenCharacter;
+                case 2 -> attacker = otherChosenCharacter;
+                default -> System.out.println("Invalid choice!");
             }
 
-            if(Monster.HP == 0){
+            if (attacker == null) continue;
+
+            System.out.println("1. Attack");
+            System.out.println("2. Use Skill");
+            System.out.print("What would " + attacker.name + " like to do? ");
+            int decision = scanner.nextInt();
+            System.out.println();
+
+            switch (decision) {
+                case 1 -> {
+                    Skill attack = new Skill.Attack();
+                    attack.use(attacker, Monster);
+                }
+                case 2 ->{
+                    if(attacker instanceof Quinn){
+                        attacker.UltimateSkill.use(attacker, chosenCharacter);
+                    }
+                    attacker.UltimateSkill.use(attacker, Monster);
+                }
+                default -> System.out.println("Invalid action!");
+            }
+
+            if (Monster.HP <= 0) {
                 System.out.println(".");
                 System.out.println("..");
                 System.out.println("...");
                 System.out.println("URGH!, Young Warrior... you are strong...");
                 System.out.println("THUD!");
-                System.out.println(" ");
+                System.out.println();
                 System.out.println("----------- | YOU WIN | -----------");
-
                 break;
             }
 
             System.out.println("----------- | Monster's Turn | -----------");
-            Attack.use(Monster, chosenCharacter);
+            Skill monsterAttack = new Skill.Attack();
+            monsterAttack.use(Monster, attacker);
+
+            if (attacker.HP <= 0) {
+                System.out.println(attacker.name + " has been defeated!");
+            }
 
             Round++;
 
-        }while(Monster.HP != 0);
+        } while (Monster.HP > 0 && (chosenCharacter.HP > 0 || otherChosenCharacter.HP > 0));
     }
 
     public void createAndShowGUI() {

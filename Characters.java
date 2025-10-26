@@ -6,12 +6,13 @@ import static game.Skill.*;
 
 public abstract class Character {
 
-    int level, HP, MP, ATK, DEF, SPD, INT, WIS;
+    int level, HP, MP, ATK, DEF, SPD, INT, WIS, maxHP;
     final String name;
     Skill UltimateSkill;
 
-    public Character(String name, int level, int HP, int MP, int ATK, int DEF, int SPD, int INT, int WIS, Skill UltimateSkill) {
+    public Character(String name, int maxHP, int level, int HP, int MP, int ATK, int DEF, int SPD, int INT, int WIS, Skill UltimateSkill) {
         this.name = name;
+        this.maxHP = maxHP;
         this.level = level;
         this.HP = HP;
         this.MP = MP;
@@ -33,7 +34,7 @@ public abstract class Character {
 
     public static  class Dorothy extends Character{
         public Dorothy(){
-            super("Dorothy", 1, 150, 100, 50, 100, 50, 40, 40, new FloorPlan());
+            super("Dorothy",150, 1, 150, 100, 50, 100, 50, 40, 40, new FloorPlan());
         }
 
         @Override
@@ -50,7 +51,7 @@ public abstract class Character {
 
     public static class Quinn extends Character{
         public Quinn(){
-            super("Quinn", 1, 150, 100, 50, 50, 50, 40, 40, new FirstAid());
+            super("Quinn", 150, 1, 150, 100, 50, 50, 50, 40, 40, new FirstAid());
         }
 
         @Override
@@ -66,7 +67,7 @@ public abstract class Character {
 
     public static class Noah extends Character{
         public Noah(){
-            super("Noah", 1, 100, 100, 80, 80, 150, 40, 40, new Transformation());
+            super("Noah", 100, 1, 100, 100, 80, 80, 150, 40, 40, new Transformation());
         }
 
         @Override
@@ -82,7 +83,7 @@ public abstract class Character {
 
     public static class Darwin extends Character{
         public Darwin(){
-            super("Darwin", 1, 100, 100, 50, 80, 50, 80, 40, new HardHats());
+            super("Darwin", 100, 1, 100, 100, 50, 80, 50, 80, 40, new HardHats());
         }
 
         @Override
@@ -98,7 +99,7 @@ public abstract class Character {
 
     public static class Ace extends Character{
         public Ace(){
-            super("Ace", 1, 100, 100, 50, 80, 50, 40, 80, new ExistentialCrisis());
+            super("Ace", 100,1, 100, 100, 50, 80, 50, 40, 80, new ExistentialCrisis());
         }
 
         @Override
@@ -114,7 +115,7 @@ public abstract class Character {
 
     public static class Monster extends Character{
         public Monster(){
-            super("Monster", 1, 1000, 100, 80, 20, 50, 30, 30, new ExistentialCrisis());
+            super("Monster", 100,1, 1000, 100, 80, 20, 50, 30, 30, new ExistentialCrisis());
         }
 
         @Override

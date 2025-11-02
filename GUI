@@ -273,7 +273,7 @@ public class GUI {
                 progressTimer.stop();
 
                 // Transition sa next panel para mag start na ang game
-                GameStart gamePanel = new GameStart(frame);// charchar ra ang gamescene, ilisan og actual name sa class
+                BattlePanel gamePanel = new BattlePanel(frame);// charchar ra ang gamescene, ilisan og actual name sa class
                 frame.setContentPane(gamePanel);
                 frame.revalidate();
                 frame.repaint();
@@ -282,51 +282,6 @@ public class GUI {
             repaint();
         }
 
-    }
-
-    // === START GAME ===
-    class GameStart extends JPanel {
-        private JFrame frame;
-        private JButton backButton;
-
-        public GameStart(JFrame frame) {
-            this.frame = frame;
-            setLayout(null);
-            setBackground(Color.BLACK);
-
-            // Balik sa main nga screen
-            backButton = new JButton("BACK TO MENU");
-            backButton.setFont(new Font("Monospaced", Font.BOLD, 20));
-            backButton.setBackground(Color.BLACK);
-            backButton.setForeground(Color.WHITE);
-            backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-            backButton.setBounds(30,    30, 200, 40);
-            add(backButton);
-
-            backButton.addActionListener(e -> {
-                TitlePanel mainPage = new TitlePanel(frame);
-                frame.setContentPane(mainPage);
-                frame.revalidate();
-                frame.repaint();
-            });
-
-
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.setColor(Color.WHITE);
-
-            for (int i = 0; i < 150; i++) {
-                int x = (int) (Math.random() * getWidth());
-                int y = (int) (Math.random() * getHeight());
-                g.fillRect(x, y, 2, 2);
-            }
-
-            g.setFont(new Font("Monospaced", Font.BOLD, 40));
-            g.drawString("Game Start", 300, 300);
-        }
     }
 
 

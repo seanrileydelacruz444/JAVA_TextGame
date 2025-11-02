@@ -374,23 +374,47 @@ class BattleScenePanel extends JPanel implements ActionListener {
     private void showSkillDialogue(String characterName, String skill) {
         int charIndex = characterNames.indexOf(characterName);
 
-        if (charIndex != -1) {
+        if (charIndex != -1)
+        {
             String dialogue = "";
-            if (characterName.equals("Noah")) {
-                if (skill.equals("CELLPHONE")) dialogue = "Distracting with tech!";
-                else if (skill.equals("CALL VIRUS")) dialogue = "Spread!";
-                else if (skill.equals("TRANSFORMATION")) dialogue = "Watch me level up!";
-                else dialogue = "Take this!";
-            } else if (characterName.equals("Darwin")) {
-                if (skill.equals("SURVEY CAMERA")) dialogue = "Capturing your weaknesses!";
-                else if (skill.equals("HEAVY CALCULATIONS")) dialogue = "My calculations predict your defeat!";
+            if (characterName.equals("Dorothy")) {
+                if (skill.equals("T-SQUARE")) dialogue = "Let me straighten out your crooked intentions!";
+                else if (skill.equals("COMPASS")) dialogue = "I'll circle your weaknesses until there's no escape!";
+                else if (skill.equals("SUCCESSFUL FLOOR PLAN")) dialogue = "This blueprint ends with your defeat!";
+                else dialogue = "Time to demolish your plans!";
+            }
+            else if (characterName.equals("Quinn"))
+            {
+                if (skill.equals("FIRST AID KIT")) dialogue = "Healing allies!";
+                else if (skill.equals("SPRAY BOTTLE")) dialogue = "Let me disinfect this situation!";
+                else if (skill.equals("SYRINGE ATTACK")) dialogue = "This injection will cure your hostility!";
+                else dialogue = "Time for some medical intervention!";
+            }
+            else if (characterName.equals("Noah"))
+            {
+                if (skill.equals("CELLPHONE")) dialogue = "Let me scroll through your system vulnerabilities!";
+                else if (skill.equals("CALL VIRUS")) dialogue = "We've got a bug to exterminate over here!";
+                else if (skill.equals("TRANSFORMATION")) dialogue = "Watch me upgrade my attack protocols!";
+                else dialogue = "System override initiated!";
+            }
+            else if (characterName.equals("Darwin"))
+            {
+                if (skill.equals("SURVEY CAMERA")) dialogue = "Capturing all your structural flaws!";
+                else if (skill.equals("HEAVY CALCULATIONS")) dialogue = "My equations predict your imminent collapse!";
                 else if (skill.equals("HARD HATS")) dialogue = "Safety first!";
+                else dialogue = "Engineering precision strike engaged!";
+            }
+            else if (characterName.equals("Ace"))
+            {
+                if (skill.equals("PSYCHOLOGY BOOK")) dialogue = "Chapter one: How to defeat overconfident monsters!";
+                else if (skill.equals("UNO REVERSE CARD")) dialogue = "Reversing attack!";
+                else if (skill.equals("EXISTENTIAL CRISIS")) dialogue = "What if... you were never meant to win?";
                 else dialogue = "Engineering power!";
             }
 
             System.out.println("=== " + characterName + " uses " + skill + "! ===");
             System.out.println(characterName + ": '" + dialogue + "'");
-            System.out.println("Monster: 'Ouch! That hurt!'");
+            System.out.println("Monster: 'Ouch! That hurt! Your grades will go down with you!'");
             System.out.println("==========================");
 
             characterDialogueLabels[charIndex].setText("<html><center>" + dialogue + "</center></html>");

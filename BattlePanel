@@ -1,204 +1,44 @@
 package game;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.util.Random;
 
-public class BattlePanel extends JPanel implements ActionListener {
+public class MonsterDrawer {
 
-    private JFrame frame;
-    private final java.util.List<JButton> selectedCharacters = new ArrayList<>();
-    private final java.util.List<JButton> characterButtons = new ArrayList<>();
-    private final java.util.List<Point> stars = new ArrayList<>();
-    private final java.util.List<Integer> starSpeeds = new ArrayList<>();
-    private final Map<String, String[]> characterSkills = new HashMap<>();
-    private final Map<JButton, String> selectedSkills = new HashMap<>();
+    public static void drawMonster(Graphics2D g2d, int x, int y, int w, int h, boolean showLabel) {
+        // Body - Using vibrant colors
+        Color[] bookColors = {
+                new Color(255, 150, 50),   // Orange
+                new Color(200, 80, 30),    // Dark orange
+                new Color(80, 180, 255)    // Bright blue
+        };
 
-    private JButton confirmButton;
-    private javax.swing.Timer starTimer;
-    private Rectangle monsterBounds;
-    private JPanel titlePanel;
-
-    public BattlePanel(JFrame frame) {
-        this.frame = frame;
-        setLayout(null);
-        setBackground(Color.BLACK);
-
-        // === SKILL DATA ===
-        characterSkills.put("Dorothy", new String[]{"Skill 1: T SQUARE", "Skill 2: COMPASS", "Ultimate: SUCCESSFUL FLOOR PLAN"});
-        characterSkills.put("Quinn", new String[]{"Skill 1: FIRST AID KIT", "Skill 2: SPRAY BOTTLE", "Ultimate: SYRINGE ATTACK"});
-        characterSkills.put("Noah", new String[]{"Skill 1: CELLPHONE", "Skill 2: CALL VIRUS", "Ultimate: TRANSFORMATION"});
-        characterSkills.put("Darwin", new String[]{"Skill 1: SURVEY CAMERA", "Skill 2: HEAVY CALCULATIONS", "Ultimate: HARD HATS"});
-        characterSkills.put("Ace", new String[]{"Skill 1: PSYCHOLOGY BOOK", "Skill 2: UNO REVERSE CARD", "Ultimate: EXISTENTIAL CRISIS"});
-
-        // === STAR BACKGROUND ===
-        generateStars(180);
-        starTimer = new javax.swing.Timer(50, this);
-        starTimer.start();
-
-        // === TITLE ===
-        titlePanel = new JPanel();
-        titlePanel.setBackground(Color.BLACK);
-        titlePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        titlePanel.setLayout(null);
-        add(titlePanel);
-
-        JLabel titleLabel = new JLabel("Choose your fighters to defeat the Schoolworks Monster!");
-        titleLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setBounds(40, 25, 700, 30);
-        titlePanel.add(titleLabel);
-
-        // === CHARACTER BUTTONS ===
-        String[] characters = {"Dorothy", "Quinn", "Noah", "Darwin", "Ace"};
-        for (String name : characters) {
-            JButton charBtn = createOutlinedButton(name);
-            charBtn.addActionListener(e -> handleCharacterClick(charBtn));
-            add(charBtn);
-            characterButtons.add(charBtn);
-        }
-
-        // === ATTACK BUTTON ===
-        confirmButton = new JButton("ATTACK");
-        confirmButton.setFont(new Font("Monospaced", Font.BOLD, 14));
-        confirmButton.setForeground(Color.WHITE);
-        confirmButton.setBackground(Color.BLACK);
-        confirmButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        confirmButton.setFocusPainted(false);
-        confirmButton.addActionListener(e -> attackAction());
-        add(confirmButton);
-
-        // Recenter when resized
-        frame.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                repositionComponents();
-            }
-        });
-
-        // Delay the first layout until after shown
-        SwingUtilities.invokeLater(this::repositionComponents);
-    }
-
-    private JButton createOutlinedButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setFocusPainted(false);
-        btn.setBackground(Color.BLACK);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        btn.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        btn.setContentAreaFilled(false);
-        return btn;
-    }
-
-    private void handleCharacterClick(JButton button) {
-        if (selectedCharacters.contains(button)) {
-            button.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-            selectedCharacters.remove(button);
-            selectedSkills.remove(button);
-        } else {
-            if (selectedCharacters.size() >= 2) {
-                JOptionPane.showMessageDialog(this, "You can only select up to 2 characters!");
-                return;
-            }
-
-            String[] skills = characterSkills.get(button.getText());
-            if (skills == null) return;
-
-            String selectedSkill = (String) JOptionPane.showInputDialog(
-                    this,
-                    "Select a skill for " + button.getText(),
-                    "Skill Selection",
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    skills,
-                    skills[0]
-            );
-
-            if (selectedSkill != null) {
-                button.setBorder(BorderFactory.createLineBorder(Color.CYAN, 2));
-                selectedCharacters.add(button);
-                selectedSkills.put(button, selectedSkill);
-            }
-        }
-    }
-
-    private void generateStars(int count) {
-        Random rand = new Random();
-        for (int i = 0; i < count; i++) {
-            stars.add(new Point(rand.nextInt(900), rand.nextInt(600)));
-            starSpeeds.add(1 + rand.nextInt(3));
-        }
-    }
-
-    private void repositionComponents() {
-        int panelWidth = Math.max(getWidth(), 900);
-        int panelHeight = Math.max(getHeight(), 600);
-
-        int titleWidth = 700, titleHeight = 90;
-        int titleX = (panelWidth - titleWidth) / 2;
-        int titleY = 30;
-        titlePanel.setBounds(titleX, titleY, titleWidth, titleHeight);
-
-        int buttonWidth = 120, buttonHeight = 80, spacing = 20;
-        int totalWidth = characterButtons.size() * buttonWidth + (characterButtons.size() - 1) * spacing;
-        int startX = (panelWidth - totalWidth) / 2;
-        int charY = titleY + titleHeight + 20;
-
-        for (int i = 0; i < characterButtons.size(); i++) {
-            JButton btn = characterButtons.get(i);
-            btn.setBounds(startX + i * (buttonWidth + spacing), charY, buttonWidth, buttonHeight);
-        }
-
-        int monsterWidth = 200, monsterHeight = 180;
-        int monsterX = (panelWidth - monsterWidth) / 2;
-        int monsterY = charY + buttonHeight + 30;
-        monsterBounds = new Rectangle(monsterX, monsterY, monsterWidth, monsterHeight);
-
-        int confirmWidth = 150, confirmHeight = 45;
-        int confirmX = (panelWidth - confirmWidth) / 2;
-        int confirmY = monsterY + monsterHeight + 20;
-        confirmButton.setBounds(confirmX, confirmY, confirmWidth, confirmHeight);
-
-        repaint();
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-        // === Stars ===
-        g2d.setColor(Color.WHITE);
-        for (Point star : stars) g2d.fillRect(star.x, star.y, 2, 2);
-
-        if (monsterBounds == null) return;
-
-        int x = monsterBounds.x, y = monsterBounds.y, w = monsterBounds.width, h = monsterBounds.height;
-
-        // Body
-        Color[] bookColors = {new Color(255, 200, 0), new Color(200, 100, 50), new Color(100, 180, 255)};
         for (int i = 0; i < 3; i++) {
             g2d.setColor(bookColors[i]);
             g2d.fillRoundRect(x, y + h - (i + 1) * 40, w, 35, 15, 15);
-            g2d.setColor(Color.DARK_GRAY);
+            g2d.setColor(new Color(60, 60, 60));
             g2d.fillRect(x + 10, y + h - (i + 1) * 40 + 5, 20, 25);
         }
 
         // Head
-        g2d.setColor(new Color(255, 255, 200));
+        g2d.setColor(new Color(255, 240, 200));
         g2d.fillRoundRect(x + 40, y + h - 180, w - 80, 60, 20, 20);
 
         // Horns
-        g2d.setColor(new Color(255, 220, 100));
+        g2d.setColor(new Color(255, 200, 80));
         g2d.fillRect(x + 35, y + h - 180, 15, 40);
         g2d.fillRect(x + w - 50, y + h - 180, 15, 40);
 
         // Horn tips
-        g2d.setColor(new Color(150, 75, 0));
-        Polygon leftTip = new Polygon(new int[]{x + 35, x + 43, x + 50}, new int[]{y + h - 180, y + h - 195, y + h - 180}, 3);
-        Polygon rightTip = new Polygon(new int[]{x + w - 50, x + w - 42, x + w - 35}, new int[]{y + h - 180, y + h - 195, y + h - 180}, 3);
+        g2d.setColor(new Color(180, 100, 0));
+        Polygon leftTip = new Polygon(
+                new int[]{x + 35, x + 43, x + 50},
+                new int[]{y + h - 180, y + h - 195, y + h - 180}, 3
+        );
+        Polygon rightTip = new Polygon(
+                new int[]{x + w - 50, x + w - 42, x + w - 35},
+                new int[]{y + h - 180, y + h - 195, y + h - 180}, 3
+        );
         g2d.fillPolygon(leftTip);
         g2d.fillPolygon(rightTip);
 
@@ -206,49 +46,26 @@ public class BattlePanel extends JPanel implements ActionListener {
         g2d.setColor(Color.WHITE);
         g2d.fillOval(x + 60, y + h - 160, 15, 15);
         g2d.fillOval(x + w - 90, y + h - 160, 15, 15);
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(new Color(30, 30, 30));
         g2d.fillOval(x + 65, y + h - 155, 5, 5);
         g2d.fillOval(x + w - 85, y + h - 155, 5, 5);
 
         // Mouth
-        g2d.setColor(Color.RED);
+        g2d.setColor(new Color(220, 0, 0));
         g2d.setStroke(new BasicStroke(3));
         g2d.drawArc(x + 70, y + h - 130, 60, 30, 0, -180);
 
-        // Label
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
-        g2d.drawString("SCHOOLWORKS MONSTER", x + 20, y + h - 190);
+        // Label - Only show if showLabel is true, and place at bottom
+        if (showLabel) {
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
+            // Position label at bottom of monster
+            g2d.drawString("SCHOOLWORKS MONSTER", x + 10, y + h + 20);
+        }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Random rand = new Random();
-        for (int i = 0; i < stars.size(); i++) {
-            Point star = stars.get(i);
-            star.y += starSpeeds.get(i);
-            if (star.y > getHeight()) {
-                star.y = 0;
-                star.x = rand.nextInt(getWidth());
-            }
-        }
-        repaint();
-    }
-
-    private void attackAction() {
-        if (selectedCharacters.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select at least one character!");
-            return;
-        }
-
-        StringBuilder msg = new StringBuilder("ATTACK initiated by:\n");
-        for (JButton btn : selectedCharacters) {
-            msg.append(btn.getText());
-            String skill = selectedSkills.get(btn);
-            if (skill != null) msg.append(" using ").append(skill);
-            msg.append("\n");
-        }
-
-        JOptionPane.showMessageDialog(this, msg.toString());
+    // Overloaded method for backward compatibility (shows label by default)
+    public static void drawMonster(Graphics2D g2d, int x, int y, int w, int h) {
+        drawMonster(g2d, x, y, w, h, true);
     }
 }

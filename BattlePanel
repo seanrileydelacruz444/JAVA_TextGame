@@ -1,71 +1,212 @@
 package game;
 
+import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
+import java.awt.event.*;
+import java.util.*;
 
-public class MonsterDrawer {
+public class BattlePanel extends JPanel implements ActionListener {
 
-    public static void drawMonster(Graphics2D g2d, int x, int y, int w, int h, boolean showLabel) {
-        // Body - Using vibrant colors
-        Color[] bookColors = {
-                new Color(255, 150, 50),   // Orange
-                new Color(200, 80, 30),    // Dark orange
-                new Color(80, 180, 255)    // Bright blue
-        };
+    private JFrame frame;
+    private final ArrayList<JButton> selectedCharacters = new ArrayList<>();
+    private final ArrayList<JButton> characterButtons = new ArrayList<>();
+    private final ArrayList<Point> stars = new ArrayList<>();
+    private final ArrayList<Integer> starSpeeds = new ArrayList<>();
 
-        for (int i = 0; i < 3; i++) {
-            g2d.setColor(bookColors[i]);
-            g2d.fillRoundRect(x, y + h - (i + 1) * 40, w, 35, 15, 15);
-            g2d.setColor(new Color(60, 60, 60));
-            g2d.fillRect(x + 10, y + h - (i + 1) * 40 + 5, 20, 25);
+    private JButton startBattleButton;
+    private javax.swing.Timer starTimer;
+    private Rectangle monsterBounds;
+    private JPanel titlePanel;
+
+    // Selected characters
+    private ArrayList<String> selectedCharacterNames = new ArrayList<>();
+
+    public BattlePanel(JFrame frame) {
+        this.frame = frame;
+        setLayout(null);
+        setBackground(Color.BLACK);
+
+        // === STAR BACKGROUND ===
+        generateStars(180);
+        starTimer = new javax.swing.Timer(50, this);
+        starTimer.start();
+
+        // === TITLE ===
+        titlePanel = new JPanel();
+        titlePanel.setBackground(Color.BLACK);
+        titlePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        titlePanel.setLayout(null);
+        add(titlePanel);
+
+        JLabel titleLabel = new JLabel("Choose 2 characters to defeat the Schoolworks Monster!");
+        titleLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBounds(40, 25, 700, 30);
+        titlePanel.add(titleLabel);
+
+        // Counter for selected characters
+        JLabel counterLabel = new JLabel("Selected: 0/2");
+        counterLabel.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        counterLabel.setForeground(Color.GREEN);
+        counterLabel.setBounds(40, 55, 200, 20);
+        titlePanel.add(counterLabel);
+
+        // === CHARACTER BUTTONS ===
+        String[] characters = {"Dorothy", "Quinn", "Noah", "Darwin", "Ace"};
+        for (String name : characters) {
+            JButton charBtn = createCharacterButton(name);
+            charBtn.addActionListener(e -> handleCharacterClick(charBtn, counterLabel));
+            add(charBtn);
+            characterButtons.add(charBtn);
         }
 
-        // Head
-        g2d.setColor(new Color(255, 240, 200));
-        g2d.fillRoundRect(x + 40, y + h - 180, w - 80, 60, 20, 20);
+        // === START BATTLE BUTTON ===
+        startBattleButton = new JButton("START BATTLE");
+        startBattleButton.setFont(new Font("Monospaced", Font.BOLD, 16));
+        startBattleButton.setForeground(Color.WHITE);
+        startBattleButton.setBackground(Color.BLACK);
+        startBattleButton.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+        startBattleButton.setFocusPainted(false);
+        startBattleButton.addActionListener(e -> startBattleAction());
+        startBattleButton.setEnabled(false);
+        add(startBattleButton);
 
-        // Horns
-        g2d.setColor(new Color(255, 200, 80));
-        g2d.fillRect(x + 35, y + h - 180, 15, 40);
-        g2d.fillRect(x + w - 50, y + h - 180, 15, 40);
+        // Recenter when resized
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                repositionComponents();
+            }
+        });
 
-        // Horn tips
-        g2d.setColor(new Color(180, 100, 0));
-        Polygon leftTip = new Polygon(
-                new int[]{x + 35, x + 43, x + 50},
-                new int[]{y + h - 180, y + h - 195, y + h - 180}, 3
-        );
-        Polygon rightTip = new Polygon(
-                new int[]{x + w - 50, x + w - 42, x + w - 35},
-                new int[]{y + h - 180, y + h - 195, y + h - 180}, 3
-        );
-        g2d.fillPolygon(leftTip);
-        g2d.fillPolygon(rightTip);
+        // delay first layout
+        SwingUtilities.invokeLater(this::repositionComponents);
+    }
 
-        // Eyes
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(x + 60, y + h - 160, 15, 15);
-        g2d.fillOval(x + w - 90, y + h - 160, 15, 15);
-        g2d.setColor(new Color(30, 30, 30));
-        g2d.fillOval(x + 65, y + h - 155, 5, 5);
-        g2d.fillOval(x + w - 85, y + h - 155, 5, 5);
+    private JButton createCharacterButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFocusPainted(false);
+        btn.setBackground(Color.BLACK);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Monospaced", Font.BOLD, 12));
+        btn.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        btn.setContentAreaFilled(true);
+        return btn;
+    }
 
-        // Mouth
-        g2d.setColor(new Color(220, 0, 0));
-        g2d.setStroke(new BasicStroke(3));
-        g2d.drawArc(x + 70, y + h - 130, 60, 30, 0, -180);
+    private void handleCharacterClick(JButton button, JLabel counterLabel) {
+        String characterName = button.getText();
 
-        // Label - Only show if showLabel is true, and place at bottom
-        if (showLabel) {
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
-            // Position label at bottom of monster
-            g2d.drawString("SCHOOLWORKS MONSTER", x + 10, y + h + 20);
+        if (selectedCharacters.contains(button)) {
+            // Deselect character
+            button.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+            button.setBackground(new Color(40, 40, 40));
+            selectedCharacters.remove(button);
+            selectedCharacterNames.remove(characterName);
+        } else {
+            if (selectedCharacters.size() >= 2) {
+                JOptionPane.showMessageDialog(this, "You can only select 2 characters!");
+                return;
+            }
+
+            // Select character
+            button.setBorder(BorderFactory.createLineBorder(Color.CYAN, 3));
+            button.setBackground(new Color(0, 80, 120));
+            selectedCharacters.add(button);
+            selectedCharacterNames.add(characterName);
+        }
+
+        // counter update
+        counterLabel.setText("Selected: " + selectedCharacters.size() + "/2");
+        startBattleButton.setEnabled(selectedCharacters.size() == 2);
+        startBattleButton.setBackground(selectedCharacters.size() == 2 ? new Color(0, 150, 0) : new Color(0, 100, 0));
+    }
+
+    private void generateStars(int count) {
+        Random rand = new Random();
+        for (int i = 0; i < count; i++) {
+            stars.add(new Point(rand.nextInt(900), rand.nextInt(600)));
+            starSpeeds.add(1 + rand.nextInt(3));
         }
     }
 
-    // Overloaded method for backward compatibility (shows label by default)
-    public static void drawMonster(Graphics2D g2d, int x, int y, int w, int h) {
-        drawMonster(g2d, x, y, w, h, true);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Stars
+        g2d.setColor(Color.WHITE);
+        for (Point star : stars) g2d.fillRect(star.x, star.y, 2, 2);
+
+        if (monsterBounds == null) return;
+
+
+        MonsterDrawer.drawMonster(g2d, monsterBounds.x, monsterBounds.y,
+                monsterBounds.width, monsterBounds.height, true);
+    }
+
+
+    private void repositionComponents() {
+        int panelWidth = Math.max(getWidth(), 900);
+        int panelHeight = Math.max(getHeight(), 600);
+
+        int titleWidth = 700, titleHeight = 90;
+        int titleX = (panelWidth - titleWidth) / 2;
+        int titleY = 30;
+        titlePanel.setBounds(titleX, titleY, titleWidth, titleHeight);
+
+        int buttonWidth = 120, buttonHeight = 80, spacing = 20;
+        int totalWidth = characterButtons.size() * buttonWidth + (characterButtons.size() - 1) * spacing;
+        int startX = (panelWidth - totalWidth) / 2;
+        int charY = titleY + titleHeight + 20;
+
+        for (int i = 0; i < characterButtons.size(); i++) {
+            JButton btn = characterButtons.get(i);
+            btn.setBounds(startX + i * (buttonWidth + spacing), charY, buttonWidth, buttonHeight);
+        }
+
+      // position sa monster
+        int monsterWidth = 200, monsterHeight = 180;
+        int monsterX = (panelWidth - monsterWidth) / 2;
+        int monsterY = charY + buttonHeight + 10;
+
+        monsterBounds = new Rectangle(monsterX, monsterY, monsterWidth, monsterHeight);
+
+
+        int battleButtonWidth = 200, battleButtonHeight = 50;
+        int battleButtonX = (panelWidth - battleButtonWidth) / 2;
+        int battleButtonY = monsterY + monsterHeight + 40;
+
+        startBattleButton.setBounds(battleButtonX, battleButtonY, battleButtonWidth, battleButtonHeight);
+
+        repaint();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Random rand = new Random();
+        for (int i = 0; i < stars.size(); i++) {
+            Point star = stars.get(i);
+            star.y += starSpeeds.get(i);
+            if (star.y > getHeight()) {
+                star.y = 0;
+                star.x = rand.nextInt(getWidth());
+            }
+        }
+        repaint();
+    }
+
+    private void startBattleAction() {
+        if (selectedCharacterNames.size() != 2) {
+            JOptionPane.showMessageDialog(this, "Please select exactly 2 characters!");
+            return;
+        }
+
+        // Transition sa battle scene
+        BattleScenePanel battleScene = new BattleScenePanel(frame, selectedCharacterNames);
+        frame.setContentPane(battleScene);
+        frame.revalidate();
+        frame.repaint();
     }
 }

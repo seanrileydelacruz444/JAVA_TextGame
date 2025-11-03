@@ -377,39 +377,47 @@ class BattleScenePanel extends JPanel implements ActionListener {
         if (charIndex != -1)
         {
             String dialogue = "";
-            if (characterName.equals("Dorothy")) {
-                if (skill.equals("T-SQUARE")) dialogue = "Let me straighten out your crooked intentions!";
-                else if (skill.equals("COMPASS")) dialogue = "I'll circle your weaknesses until there's no escape!";
-                else if (skill.equals("SUCCESSFUL FLOOR PLAN")) dialogue = "This blueprint ends with your defeat!";
-                else dialogue = "Time to demolish your plans!";
-            }
-            else if (characterName.equals("Quinn"))
-            {
-                if (skill.equals("FIRST AID KIT")) dialogue = "Healing allies!";
-                else if (skill.equals("SPRAY BOTTLE")) dialogue = "Let me disinfect this situation!";
-                else if (skill.equals("SYRINGE ATTACK")) dialogue = "This injection will cure your hostility!";
-                else dialogue = "Time for some medical intervention!";
-            }
-            else if (characterName.equals("Noah"))
-            {
-                if (skill.equals("CELLPHONE")) dialogue = "Let me scroll through your system vulnerabilities!";
-                else if (skill.equals("CALL VIRUS")) dialogue = "We've got a bug to exterminate over here!";
-                else if (skill.equals("TRANSFORMATION")) dialogue = "Watch me upgrade my attack protocols!";
-                else dialogue = "System override initiated!";
-            }
-            else if (characterName.equals("Darwin"))
-            {
-                if (skill.equals("SURVEY CAMERA")) dialogue = "Capturing all your structural flaws!";
-                else if (skill.equals("HEAVY CALCULATIONS")) dialogue = "My equations predict your imminent collapse!";
-                else if (skill.equals("HARD HATS")) dialogue = "Safety first!";
-                else dialogue = "Engineering precision strike engaged!";
-            }
-            else if (characterName.equals("Ace"))
-            {
-                if (skill.equals("PSYCHOLOGY BOOK")) dialogue = "Chapter one: How to defeat overconfident monsters!";
-                else if (skill.equals("UNO REVERSE CARD")) dialogue = "Reversing attack!";
-                else if (skill.equals("EXISTENTIAL CRISIS")) dialogue = "What if... you were never meant to win?";
-                else dialogue = "Engineering power!";
+            switch (characterName) {
+                case "Dorothy" -> {
+                    dialogue = switch (skill) {
+                        case "T-SQUARE" -> "Let me straighten out your crooked intentions!";
+                        case "COMPASS" -> "I'll circle your weaknesses until there's no escape!";
+                        case "SUCCESSFUL FLOOR PLAN" -> "This blueprint ends with your defeat!";
+                        default -> "Time to demolish your plans!";
+                    };
+                }
+                case "Quinn" -> {
+                    dialogue = switch (skill) {
+                        case "FIRST AID KIT" -> "Healing allies!";
+                        case "SPRAY BOTTLE" -> "Let me disinfect this situation!";
+                        case "SYRINGE ATTACK" -> "This injection will cure your hostility!";
+                        default -> "Time for some medical intervention!";
+                    };
+                }
+                case "Noah" -> {
+                    dialogue = switch (skill) {
+                        case "CELLPHONE" -> "Let me scroll through your system vulnerabilities!";
+                        case "CALL VIRUS" -> "We've got a bug to exterminate over here!";
+                        case "TRANSFORMATION" -> "Watch me upgrade my attack protocols!";
+                        default -> "System override initiated!";
+                    };
+                }
+                case "Darwin" -> {
+                    dialogue = switch (skill) {
+                        case "SURVEY CAMERA" -> "Capturing all your structural flaws!";
+                        case "HEAVY CALCULATIONS" -> "My equations predict your imminent collapse!";
+                        case "HARD HATS" -> "Safety first!";
+                        default -> "Engineering precision strike engaged!";
+                    };
+                }
+                case "Ace" -> {
+                    dialogue = switch (skill) {
+                        case "PSYCHOLOGY BOOK" -> "Chapter one: How to defeat overconfident monsters!";
+                        case "UNO REVERSE CARD" -> "Reversing attack!";
+                        case "EXISTENTIAL CRISIS" -> "What if... you were never meant to win?";
+                        default -> "Engineering power!";
+                    };
+                }
             }
 
             System.out.println("=== " + characterName + " uses " + skill + "! ===");

@@ -1,0 +1,80 @@
+package game;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Random;
+
+public class RoundThreePanel extends JPanel implements ActionListener {
+
+    private JFrame frame;
+    private Timer starTimer;
+    private Timer delayTimer;
+    private final java.util.List<Point> stars = new java.util.ArrayList<>();
+    private final java.util.List<Integer> starSpeeds = new java.util.ArrayList<>();
+
+    public RoundThreePanel(JFrame frame) {
+        this.frame = frame;
+        setBackground(Color.BLACK);
+        setLayout(null);
+
+        generateStars(150);
+
+       
+        starTimer = new Timer(50, this);
+        starTimer.start();
+
+        // Delay before going to RoundTwoFight panel (5 seconds)
+        delayTimer = new Timer(5000, e -> {
+            RoundThreeFight nextRound = new RoundThreeFight(frame);
+            frame.setContentPane(nextRound);
+            frame.revalidate();
+            frame.repaint();
+        });
+        delayTimer.setRepeats(false);
+        delayTimer.start();
+    }
+
+
+    private void generateStars(int count) {
+        Random rand = new Random();
+        for (int i = 0; i < count; i++) {
+            stars.add(new Point(rand.nextInt(900), rand.nextInt(600)));
+            starSpeeds.add(1 + rand.nextInt(3));
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.WHITE);
+
+        // Draw stars
+        for (Point star : stars) {
+            g.fillRect(star.x, star.y, 2, 2);
+        }
+
+        
+        g.setFont(new Font("Monospaced", Font.BOLD, 70));
+        FontMetrics fm = g.getFontMetrics();
+        String text = "ROUND 3 FIGHT";
+        int x = (getWidth() - fm.stringWidth(text)) / 2;
+        int y = getHeight() / 2;
+        g.drawString(text, x, y);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+       
+        Random rand = new Random();
+        for (int i = 0; i < stars.size(); i++) {
+            Point star = stars.get(i);
+            star.y += starSpeeds.get(i);
+            if (star.y > getHeight()) {
+                star.y = 0;
+                star.x = rand.nextInt(getWidth());
+            }
+        }
+        repaint();
+    }
+}

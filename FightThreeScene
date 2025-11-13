@@ -149,6 +149,10 @@ class FightThree extends JPanel implements ActionListener {
                 TitledBorder.CENTER, TitledBorder.TOP,
                 new Font("Monospaced", Font.BOLD, 16), new Color(255, 150, 150)
         ));
+
+
+        JLabel monsterImageLabel = createMonsterImage(monster.getName());
+        monsterPanel.add(monsterImageLabel, BorderLayout.CENTER);
  
         JPanel statsPanel = new JPanel(new GridLayout(2, 1));
         statsPanel.setOpaque(false);
@@ -167,6 +171,20 @@ class FightThree extends JPanel implements ActionListener {
         monsterPanel.add(statsPanel, BorderLayout.SOUTH);
  
         return monsterPanel;
+    }
+
+ private JLabel createMonsterImage(String monsterName) {
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+        String path = "C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\HomeworkMonsterThree.png";
+
+        ImageIcon icon = new ImageIcon(path);
+        Image scaled = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        imageLabel.setIcon(new ImageIcon(scaled));
+
+        return imageLabel;
     }
  
     //ang new buttons

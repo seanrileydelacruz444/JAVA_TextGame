@@ -5,7 +5,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.awt.image.BufferedImage;
+
 
 class FightTwo extends JPanel implements ActionListener {
     private JFrame frame;

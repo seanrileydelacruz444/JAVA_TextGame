@@ -5,12 +5,16 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-
+import java.awt.image.BufferedImage;
+import java.util.stream.IntStream;
 
 class FightTwo extends JPanel implements ActionListener {
     private JFrame frame;
     private ArrayList<Character> characters;
     private javax.swing.Timer battleTimer;
+
+    private JLabel[] characterDialogueLabels;
+    private JLabel monsterDialogueLabel;
 
     private final ArrayList<Point> stars = new ArrayList<>();
     private final ArrayList<Integer> starSpeeds = new ArrayList<>();
@@ -24,7 +28,7 @@ class FightTwo extends JPanel implements ActionListener {
     public FightTwo(JFrame frame, ArrayList<Character> characters) {
         this.frame = frame;
         this.characters = characters;
-        this.monster = new Character.HomeworkMonster();
+        this.monster = new Character.MidtermMonster();
         turnSystem = new TurnSystem(characters, monster);
 
         setLayout(new BorderLayout());
@@ -95,7 +99,8 @@ class FightTwo extends JPanel implements ActionListener {
         ));
 
         HPText = new JLabel[characters.size()];
-
+        MPText = new JLabel[characters.size()];
+        characterDialogueLabels = new JLabel[characters.size()];
         for (int i = 0; i < characters.size(); i++) {
             Character c = characters.get(i);
 
@@ -105,7 +110,7 @@ class FightTwo extends JPanel implements ActionListener {
 
             JLabel imageLabel = createImageForCharacter(c.getName());
 
-            JPanel infoPanel = new JPanel(new GridLayout(2, 1));
+            JPanel infoPanel = new JPanel(new GridLayout(4, 1));
             infoPanel.setBackground(new Color(40, 40, 80, 220));
 
             JLabel nameLabel = new JLabel(c.getName(), SwingConstants.CENTER);
@@ -116,12 +121,18 @@ class FightTwo extends JPanel implements ActionListener {
             HPText[i].setFont(new Font("Monospaced", Font.BOLD, 12));
             HPText[i].setForeground(new Color(100, 255, 100));
 
-            /*MPText[i] =  new JLabel("MP: " + c.MP + "/" + c.maxMP, SwingConstants.CENTER);
-            HPText[i].setFont(new Font("Monospaced", Font.BOLD, 12));
-            HPText[i].setForeground(new Color(100, 255, 100));*/
+            MPText[i] =  new JLabel("MP: " + c.MP + "/" + c.maxMP, SwingConstants.CENTER);
+            MPText[i].setFont(new Font("Monospaced", Font.BOLD, 12));
+            MPText[i].setForeground(new Color(100, 255, 100));
+
+            characterDialogueLabels[i] = new JLabel("", SwingConstants.CENTER);
+            characterDialogueLabels[i].setFont(new Font("Monospaced", Font.ITALIC, 13));
+            characterDialogueLabels[i].setForeground(new Color(255, 255, 150));
 
             infoPanel.add(nameLabel);
+            infoPanel.add(characterDialogueLabels[i]);
             infoPanel.add(HPText[i]);
+            infoPanel.add(MPText[i]);
 
             charCard.add(imageLabel, BorderLayout.WEST);
             charCard.add(infoPanel, BorderLayout.CENTER);
@@ -153,7 +164,7 @@ class FightTwo extends JPanel implements ActionListener {
         JLabel monsterImageLabel = createMonsterImage(monster.getName());
         monsterPanel.add(monsterImageLabel, BorderLayout.CENTER);
 
-        JPanel statsPanel = new JPanel(new GridLayout(2, 1));
+        JPanel statsPanel = new JPanel(new GridLayout(3, 1));
         statsPanel.setOpaque(false);
         statsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -165,14 +176,19 @@ class FightTwo extends JPanel implements ActionListener {
         monsterHPLabel.setFont(new Font("Monospaced", Font.BOLD, 14));
         monsterHPLabel.setForeground(new Color(255, 150, 150));
 
+        monsterDialogueLabel = new JLabel("", SwingConstants.CENTER);
+        monsterDialogueLabel.setFont(new Font("Monospaced", Font.ITALIC, 13));
+        monsterDialogueLabel.setForeground(new Color(255, 150, 150));
+
         statsPanel.add(nameLabel);
+        statsPanel.add(monsterDialogueLabel);
         statsPanel.add(monsterHPLabel);
         monsterPanel.add(statsPanel, BorderLayout.SOUTH);
 
         return monsterPanel;
     }
 
-private JLabel createMonsterImage(String monsterName) {
+    private JLabel createMonsterImage(String monsterName) {
         JLabel imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -214,10 +230,12 @@ private JLabel createMonsterImage(String monsterName) {
             {
                 turnSystem.ActionChosen(c, monster, TurnSystem.BasicAttack);
                 HP();
+                MP();
+                showDialogue(c.getName(), "ATTACK");
             });
             charActionPanel.add(attackBtn);
 
-            /*JButton Skill = new JButton("Skill 1");
+            JButton Skill = new JButton("Skill 1");
             Skill.setFont(new Font("Monospaced", Font.BOLD, 10));
             Skill.setBackground(new Color(83, 61, 143));
             Skill.setForeground(Color.WHITE);
@@ -225,8 +243,11 @@ private JLabel createMonsterImage(String monsterName) {
             Skill.addActionListener(e ->
             {
                 turnSystem.ActionChosen(c, monster, c.skill1);
+                HP();
+                MP();
+                showDialogue(c.getName(), "SKILL");
             });
-            charActionPanel.add(Skill);*/
+            charActionPanel.add(Skill);
 
             JButton ultBtn = new JButton("ULTIMATE");
             ultBtn.setFont(new Font("Monospaced", Font.BOLD, 10));
@@ -237,6 +258,8 @@ private JLabel createMonsterImage(String monsterName) {
             {
                 turnSystem.ActionChosen(c, monster, c.Ultimate);
                 HP();
+                MP();
+                showDialogue(c.getName(), "ULTIMATE");
             });
             charActionPanel.add(ultBtn);
 
@@ -252,7 +275,7 @@ private JLabel createMonsterImage(String monsterName) {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 
-        String path = "images/" + characterName.toLowerCase() + ".png";
+        String path = "C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\" + characterName.toLowerCase() + ".png";
         ImageIcon icon = new ImageIcon(path);
         if (icon.getIconWidth() > 0)
         {
@@ -270,6 +293,75 @@ private JLabel createMonsterImage(String monsterName) {
         return imageLabel;
     }
 
+    private void showDialogue(String characterName, String action) {
+        int charIndex = IntStream.range(0, characters.size()).filter(i -> characters.get(i).getName().equals(characterName)).findFirst().orElse(-1);
+
+        if (charIndex != -1) {
+            String dialogue = "";
+            switch (characterName) {
+                case "Noah" -> {
+                    dialogue = switch (action) {
+                        case "ATTACK" -> "Time to debug your existence!";
+                        case "SKILL" -> "Let me hack through your defenses!";
+                        case "ULTIMATE" -> "Deploy the mainframe attack!";
+                        default -> dialogue;
+                    };
+                }
+                case "Darwin" -> {
+                    dialogue = switch (action) {
+                        case "ATTACK" -> "This formula calculates your defeat!";
+                        case "SKILL" -> "My calculations predict your downfall!";
+                        case "ULTIMATE" -> "Maximum structural overload!";
+                        default -> dialogue;
+                    };
+                }
+                case "Dorothy" -> {
+                    dialogue = switch (action) {
+                        case "ATTACK" -> "This blueprint leads to your end!";
+                        case "SKILL" -> "Let me draw your defeat!";
+                        case "ULTIMATE" -> "Grand architectural annihilation!";
+                        default -> dialogue;
+                    };
+                }
+                case "Quinn" -> {
+                    dialogue = switch (action) {
+                        case "ATTACK" -> "Time for some medical intervention!";
+                        case "SKILL" -> "This medicine will cure your hostility!";
+                        case "ULTIMATE" -> "Full system recovery initiated!";
+                        default -> dialogue;
+                    };
+                }
+                case "Ace" -> {
+                    dialogue = switch (action) {
+                        case "ATTACK" -> "Let me analyze your weaknesses!";
+                        case "SKILL" -> "Your mind is no match for me!";
+                        case "ULTIMATE" -> "Total mental breakdown initiated!";
+                        default -> dialogue;
+                    };
+                }
+            }
+
+            String monsterSay = switch (action) {
+                case "ATTACK" -> "Time for some extra credit!";
+                case "SKILL" -> "My calculations are failing!";
+                case "ULTIMATE" -> "Let me grade your performance... F!";
+                default -> "";
+            };
+
+            characterDialogueLabels[charIndex].setText(dialogue);
+            monsterDialogueLabel.setText(monsterSay);
+
+            new javax.swing.Timer(3000, e -> {
+                characterDialogueLabels[charIndex].setText("");
+                monsterDialogueLabel.setText("");
+                ((javax.swing.Timer)e.getSource()).stop();
+            }).start();
+
+            System.out.println(characterName + ": " + dialogue);
+            System.out.println("Monster: " + monsterSay);
+        }
+    }
+
     private void HP() {
         for (int i = 0; i < characters.size(); i++) {
             Character c = characters.get(i);
@@ -278,21 +370,30 @@ private JLabel createMonsterImage(String monsterName) {
         monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
         if (monster.HP <= 0) {
-        	goToRoundThree();
+            goToRoundThree();
+        }
+    }
+
+    private void MP()
+    {
+        for(int i = 0; i < characters.size(); i++)
+        {
+            Character c = characters.get(i);
+            MPText[i].setText("MP: " + c.MP + "/" + c.maxMP);
         }
     }
 
 
     private void goToRoundThree() {
-        battleTimer.stop(); 
+        battleTimer.stop();
 
-     
+
         RoundThreePanel nextBattle = new RoundThreePanel(frame);
         frame.setContentPane(nextBattle);
         frame.revalidate();
         frame.repaint();
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

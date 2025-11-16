@@ -52,7 +52,7 @@ public class RoundThreeFight extends JPanel implements ActionListener {
         titlePanel.add(counterLabel);
 
         characterInfoLabel = new JLabel("", SwingConstants.CENTER);
-        characterInfoLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        characterInfoLabel.setFont(new Font("Monospaced", Font.PLAIN, 11));
         characterInfoLabel.setForeground(Color.WHITE);
         characterInfoLabel.setBounds(0, 0, 800, 80);
         add(characterInfoLabel);
@@ -213,7 +213,7 @@ public class RoundThreeFight extends JPanel implements ActionListener {
         monsterBounds = new Rectangle(monsterX, monsterY, monsterWidth, monsterHeight);
 
         int infoX = (panelWidth - 600) / 2;
-        int infoY = monsterY + monsterHeight - 110;
+        int infoY = monsterY + monsterHeight - 30;
         characterInfoLabel.setBounds(infoX, infoY, 600, 60);
 
         int battleButtonWidth = 200, battleButtonHeight = 50;

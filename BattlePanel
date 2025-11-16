@@ -5,7 +5,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+
 public class BattlePanel extends JPanel implements ActionListener {
+
+    final ArrayList<Character> chosenCharacters = new ArrayList<>();
 
     private JFrame frame;
     private final ArrayList<JButton> selectedCharacters = new ArrayList<>();
@@ -17,8 +20,8 @@ public class BattlePanel extends JPanel implements ActionListener {
     private javax.swing.Timer starTimer;
     private Rectangle monsterBounds;
     private JPanel titlePanel;
+    private JLabel characterInfoLabel;
 
-    // Selected characters
     private ArrayList<String> selectedCharacterNames = new ArrayList<>();
 
     public BattlePanel(JFrame frame) {
@@ -26,12 +29,10 @@ public class BattlePanel extends JPanel implements ActionListener {
         setLayout(null);
         setBackground(Color.BLACK);
 
-        // === STAR BACKGROUND ===
         generateStars(180);
         starTimer = new javax.swing.Timer(50, this);
         starTimer.start();
 
-        // === TITLE ===
         titlePanel = new JPanel();
         titlePanel.setBackground(Color.BLACK);
         titlePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
@@ -44,14 +45,18 @@ public class BattlePanel extends JPanel implements ActionListener {
         titleLabel.setBounds(40, 25, 700, 30);
         titlePanel.add(titleLabel);
 
-        // Counter for selected characters
         JLabel counterLabel = new JLabel("Selected: 0/2");
         counterLabel.setFont(new Font("Monospaced", Font.PLAIN, 14));
         counterLabel.setForeground(Color.GREEN);
         counterLabel.setBounds(40, 55, 200, 20);
         titlePanel.add(counterLabel);
 
-        // === CHARACTER BUTTONS ===
+        characterInfoLabel = new JLabel("", SwingConstants.CENTER);
+        characterInfoLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        characterInfoLabel.setForeground(Color.WHITE);
+        characterInfoLabel.setBounds(0, 0, 800, 80);
+        add(characterInfoLabel);
+
         String[] characters = {"Dorothy", "Quinn", "Noah", "Darwin", "Ace"};
         for (String name : characters) {
             JButton charBtn = createCharacterButton(name);
@@ -60,7 +65,6 @@ public class BattlePanel extends JPanel implements ActionListener {
             characterButtons.add(charBtn);
         }
 
-        // === START BATTLE BUTTON ===
         startBattleButton = new JButton("START BATTLE");
         startBattleButton.setFont(new Font("Monospaced", Font.BOLD, 16));
         startBattleButton.setForeground(Color.WHITE);
@@ -71,7 +75,6 @@ public class BattlePanel extends JPanel implements ActionListener {
         startBattleButton.setEnabled(false);
         add(startBattleButton);
 
-        // Recenter when resized
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -79,7 +82,6 @@ public class BattlePanel extends JPanel implements ActionListener {
             }
         });
 
-        // delay first layout
         SwingUtilities.invokeLater(this::repositionComponents);
     }
 
@@ -94,8 +96,34 @@ public class BattlePanel extends JPanel implements ActionListener {
         return btn;
     }
 
+    Character createCharacter(String name)
+    {
+        switch(name)
+        {
+            case "Dorothy":
+                Character Dorothy = new Character.Dorothy();
+                return Dorothy;
+            case "Quinn":
+                Character Quinn = new Character.Quinn();
+                return Quinn;
+            case "Noah":
+                Character Noah = new Character.Noah();
+                return Noah;
+            case "Darwin":
+                Character Darwin = new  Character.Darwin();
+                return Darwin;
+            case "Ace":
+                Character Ace = new Character.Ace();
+                return Ace;
+        }
+        return null;
+    }
+
     private void handleCharacterClick(JButton button, JLabel counterLabel) {
         String characterName = button.getText();
+
+        String info = getCharacterInfo(characterName);
+        characterInfoLabel.setText("<html><center>" + info + "</center></html>");
 
         if (selectedCharacters.contains(button)) {
             // Deselect character
@@ -103,6 +131,8 @@ public class BattlePanel extends JPanel implements ActionListener {
             button.setBackground(new Color(40, 40, 40));
             selectedCharacters.remove(button);
             selectedCharacterNames.remove(characterName);
+            chosenCharacters.removeIf(c -> c.getName().equals(characterName));
+
         } else {
             if (selectedCharacters.size() >= 2) {
                 JOptionPane.showMessageDialog(this, "You can only select 2 characters!");
@@ -114,12 +144,18 @@ public class BattlePanel extends JPanel implements ActionListener {
             button.setBackground(new Color(0, 80, 120));
             selectedCharacters.add(button);
             selectedCharacterNames.add(characterName);
+
+            Character chosen = createCharacter(characterName);
+            if (chosen != null) {
+                chosenCharacters.add(chosen);
+            }
         }
 
-        // counter update
+        // Update counter
         counterLabel.setText("Selected: " + selectedCharacters.size() + "/2");
         startBattleButton.setEnabled(selectedCharacters.size() == 2);
-        startBattleButton.setBackground(selectedCharacters.size() == 2 ? new Color(0, 150, 0) : new Color(0, 100, 0));
+        startBattleButton.setBackground(selectedCharacters.size() == 2 ?
+                new Color(0, 150, 0) : new Color(0, 100, 0));
     }
 
     private void generateStars(int count) {
@@ -141,9 +177,12 @@ public class BattlePanel extends JPanel implements ActionListener {
 
         if (monsterBounds == null) return;
 
-
-        MonsterDrawer.drawMonster(g2d, monsterBounds.x, monsterBounds.y,
-                monsterBounds.width, monsterBounds.height, true);
+        int wid = 200, height = 180;
+        int x = (getWidth() - wid) / 2;
+        int y = (getHeight() - (height - 60)) / 2;
+        ImageIcon monsterImageIcon = new ImageIcon("C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\HomeworkMonster.png");
+        Image monsterImage = monsterImageIcon.getImage();
+        g2d.drawImage(monsterImage, x, y, wid, height, this);
     }
 
 
@@ -166,13 +205,16 @@ public class BattlePanel extends JPanel implements ActionListener {
             btn.setBounds(startX + i * (buttonWidth + spacing), charY, buttonWidth, buttonHeight);
         }
 
-      // position sa monster
+        // position sa monster
         int monsterWidth = 200, monsterHeight = 180;
         int monsterX = (panelWidth - monsterWidth) / 2;
         int monsterY = charY + buttonHeight + 10;
 
         monsterBounds = new Rectangle(monsterX, monsterY, monsterWidth, monsterHeight);
 
+        int infoX = (panelWidth - 600) / 2;
+        int infoY = monsterY + monsterHeight - 110;
+        characterInfoLabel.setBounds(infoX, infoY, 600, 60);
 
         int battleButtonWidth = 200, battleButtonHeight = 50;
         int battleButtonX = (panelWidth - battleButtonWidth) / 2;
@@ -204,9 +246,25 @@ public class BattlePanel extends JPanel implements ActionListener {
         }
 
         // Transition sa battle scene
-        BattleScenePanel battleScene = new BattleScenePanel(frame, selectedCharacterNames);
+        BattleScenePanel battleScene = new BattleScenePanel(frame, chosenCharacters);
         frame.setContentPane(battleScene);
         frame.revalidate();
         frame.repaint();
+    }
+
+    private String getCharacterInfo(String characterName) {
+        return switch (characterName) {
+            case "Dorothy" ->
+                    "Dorothy (ARCHITECT) — HIGHEST DEFENSE<br>Skill 1: T SQUARE - Uses a T square for offense<br>ULTIMATE: SUCCESSFUL FLOOR PLAN - Summons a protective barrier";
+            case "Quinn" ->
+                    "Quinn (NURSING) — HIGHEST HP<br>Skill 1: FIRST AID KIT - Heals a single ally<br>ULTIMATE: SYRINGE REVIVE - Revives a downed ally";
+            case "Noah" ->
+                    "Noah (I.T.) — HIGHEST ATTACK<br>Skill 1: CELLPHONE - Fires electric byte strikes<br>ULTIMATE: TRANSFORMATION - Boosts armor and power";
+            case "Darwin" ->
+                    "Darwin (ENGINEERING) — HIGHEST INTELLECT<br>Skill 1: INFO DUMP - Confuses enemy, dealing INT damage<br>ULTIMATE: HARD HATS - Reduces enemy defence";
+            case "Ace" ->
+                    "Ace (PSYCHOLOGY) — HIGHEST WISDOM<br>Skill 1: PSYCHOLOGY BOOK - Confuses enemies with knowledge<br>ULTIMATE: EXISTENTIAL CRISIS - Heavy Mental attack";
+            default -> "";
+        };
     }
 }

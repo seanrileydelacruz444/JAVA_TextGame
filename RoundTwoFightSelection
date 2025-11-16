@@ -20,6 +20,7 @@ public class RoundTwoFight extends JPanel implements ActionListener {
     private javax.swing.Timer starTimer;
     private Rectangle monsterBounds;
     private JPanel titlePanel;
+    private JLabel characterInfoLabel;
 
     private ArrayList<String> selectedCharacterNames = new ArrayList<>();
 
@@ -49,6 +50,12 @@ public class RoundTwoFight extends JPanel implements ActionListener {
         counterLabel.setForeground(Color.GREEN);
         counterLabel.setBounds(40, 55, 200, 20);
         titlePanel.add(counterLabel);
+
+        characterInfoLabel = new JLabel("", SwingConstants.CENTER);
+        characterInfoLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        characterInfoLabel.setForeground(Color.WHITE);
+        characterInfoLabel.setBounds(0, 0, 800, 80);
+        add(characterInfoLabel);
 
         String[] characters = {"Dorothy", "Quinn", "Noah", "Darwin", "Ace"};
         for (String name : characters) {
@@ -115,6 +122,9 @@ public class RoundTwoFight extends JPanel implements ActionListener {
     private void handleCharacterClick(JButton button, JLabel counterLabel) {
         String characterName = button.getText();
 
+        String info = getCharacterInfo(characterName);
+        characterInfoLabel.setText("<html><center>" + info + "</center></html>");
+
         if (selectedCharacters.contains(button)) {
             // Deselect character
             button.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
@@ -170,7 +180,7 @@ public class RoundTwoFight extends JPanel implements ActionListener {
         int wid = 200, height = 180;
         int x = (getWidth() - wid) / 2;
         int y = (getHeight() - (height - 60)) / 2;
-        ImageIcon monsterImageIcon = new ImageIcon("C:/Users/User/CODE_JAVA/GUI/GUI/images/HomeworkMonster.png");
+        ImageIcon monsterImageIcon = new ImageIcon("C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\HomeworkMonsterTwo.png");
         Image monsterImage = monsterImageIcon.getImage();
         g2d.drawImage(monsterImage, x, y, wid, height, this);
     }
@@ -195,13 +205,16 @@ public class RoundTwoFight extends JPanel implements ActionListener {
             btn.setBounds(startX + i * (buttonWidth + spacing), charY, buttonWidth, buttonHeight);
         }
 
-      // position sa monster
+        // position sa monster
         int monsterWidth = 200, monsterHeight = 180;
         int monsterX = (panelWidth - monsterWidth) / 2;
         int monsterY = charY + buttonHeight + 10;
 
         monsterBounds = new Rectangle(monsterX, monsterY, monsterWidth, monsterHeight);
 
+        int infoX = (panelWidth - 600) / 2;
+        int infoY = monsterY + monsterHeight - 110;
+        characterInfoLabel.setBounds(infoX, infoY, 600, 60);
 
         int battleButtonWidth = 200, battleButtonHeight = 50;
         int battleButtonX = (panelWidth - battleButtonWidth) / 2;
@@ -236,7 +249,23 @@ public class RoundTwoFight extends JPanel implements ActionListener {
         frame.setContentPane(roundTwoScene);
         frame.revalidate();
         frame.repaint();
-        
-      }
-    
+
+    }
+
+    private String getCharacterInfo(String characterName) {
+        return switch (characterName) {
+            case "Dorothy" ->
+                    "Dorothy (ARCHITECT) — HIGHEST DEFENSE<br>Skill 1: T SQUARE - Uses a T square for offense<br>ULTIMATE: SUCCESSFUL FLOOR PLAN - Summons a protective barrier";
+            case "Quinn" ->
+                    "Quinn (NURSING) — HIGHEST HP<br>Skill 1: FIRST AID KIT - Heals a single ally<br>ULTIMATE: SYRINGE REVIVE - Revives a downed ally";
+            case "Noah" ->
+                    "Noah (I.T.) — HIGHEST ATTACK<br>Skill 1: CELLPHONE - Fires electric byte strikes<br>ULTIMATE: TRANSFORMATION - Boosts armor and power";
+            case "Darwin" ->
+                    "Darwin (ENGINEERING) — HIGHEST INTELLECT<br>Skill 1: INFO DUMP - Confuses enemy, dealing INT damage<br>ULTIMATE: HARD HATS - Reduces enemy defence";
+            case "Ace" ->
+                    "Ace (PSYCHOLOGY) — HIGHEST WISDOM<br>Skill 1: PSYCHOLOGY BOOK - Confuses enemies with knowledge<br>ULTIMATE: EXISTENTIAL CRISIS - Heavy Mental attack";
+            default -> "";
+        };
+    }
+
 }

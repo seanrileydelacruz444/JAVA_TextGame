@@ -25,6 +25,8 @@ class FightThree extends JPanel implements ActionListener {
     private Character monster;
     private TurnSystem turnSystem;
 
+    private JLabel battleTextLabel;
+
     public FightThree(JFrame frame, ArrayList<Character> characters) {
         this.frame = frame;
         this.characters = characters;
@@ -86,6 +88,45 @@ class FightThree extends JPanel implements ActionListener {
 
         JPanel actionPanel = createActionPanel();
         add(actionPanel, BorderLayout.SOUTH);
+
+        JPanel textPanel = createTextPanel();
+
+        JPanel centerContainer = new JPanel(new BorderLayout());
+        centerContainer.setOpaque(false);
+        centerContainer.add(centerPanel, BorderLayout.CENTER);
+        centerContainer.add(textPanel, BorderLayout.SOUTH);
+
+        add(centerContainer, BorderLayout.CENTER);
+    }
+
+    private JPanel createTextPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 50, 10, 50));
+        panel.setPreferredSize(new Dimension(800, 40));
+
+        battleTextLabel = new JLabel("", SwingConstants.CENTER);
+        battleTextLabel.setFont(new Font("Monospaced", Font.BOLD, 14));
+        battleTextLabel.setForeground(Color.YELLOW);
+        battleTextLabel.setOpaque(true);
+        battleTextLabel.setBackground(new Color(0, 0, 0, 180));
+
+        panel.add(battleTextLabel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private void showBattleText(String text) {
+        battleTextLabel.setText(text);
+
+        javax.swing.Timer clearTimer = new javax.swing.Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                battleTextLabel.setText("");
+                ((javax.swing.Timer) e.getSource()).stop();
+            }
+        });
+        clearTimer.start();
+        clearTimer.setRepeats(false);
     }
 
     private JPanel createCharacterPanel() {
@@ -193,7 +234,7 @@ class FightThree extends JPanel implements ActionListener {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        String path = "C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\HomeworkMonsterThree.png";
+        String path = "C:\\Users\\User\\Downloads\\GUI 3\\GUI 3\\GUI\\images\\HomeworkMonsterThree.png";
 
         ImageIcon icon = new ImageIcon(path);
         Image scaled = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
@@ -228,10 +269,18 @@ class FightThree extends JPanel implements ActionListener {
             attackBtn.setPreferredSize(new Dimension(100, 35));
             attackBtn.addActionListener(e ->
             {
-                turnSystem.ActionChosen(c, monster, TurnSystem.BasicAttack);
-                HP();
-                MP();
-                showDialogue(c.getName(), "ATTACK");
+                if (c.HP > 0) {
+                    int monsterHPBefore = monster.HP;
+                    turnSystem.ActionChosen(c, monster, TurnSystem.BasicAttack);
+                    int damage = monsterHPBefore - monster.HP;
+
+                    HP();
+                    MP();
+                    showDialogue(c.getName(), "ATTACK");
+                    showBattleText("Finals Monster took " + damage + " damage!");
+                } else {
+                    showBattleText(c.getName() + " is down!");
+                }
             });
             charActionPanel.add(attackBtn);
 
@@ -242,10 +291,51 @@ class FightThree extends JPanel implements ActionListener {
             Skill.setPreferredSize(new Dimension(100, 35));
             Skill.addActionListener(e ->
             {
-                turnSystem.ActionChosen(c, monster, c.skill1);
-                HP();
-                MP();
-                showDialogue(c.getName(), "SKILL");
+                if(c.name.equals("Quinn"))
+                {
+                    Character target = null;
+                    for(Character ally: characters)
+                    {
+                        if(ally != c)
+                        {
+                            target = ally;
+                            break;
+                        }
+                    }
+
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+
+                        int targetHPBefore = target.HP;
+
+                        turnSystem.ActionChosen(c, target, c.skill1);
+                        HP();
+                        MP();
+                        showDialogue(c.getName(), "SKILL");
+                        showBattleText(c.getName() + " is down!");
+                    } else if (c.HP <= 0) {
+                        showBattleText(c.getName() + " is down!");
+                    } else {
+                        showBattleText("Not enough MP!");
+                    }
+                }
+                else {
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+
+                        int monsterHPBefore = monster.HP;
+
+                        turnSystem.ActionChosen(c, monster, c.skill1);
+                        int damage = monsterHPBefore - monster.HP;
+
+                        HP();
+                        MP();
+                        showDialogue(c.getName(), "SKILL");
+                        showBattleText("Finals Monster took " + damage + " damage!");
+                    } else if (c.HP <= 0) {
+                        showBattleText((c.getName() + " is down!"));
+                    } else {
+                        showBattleText("Not enough MP!");
+                    }
+                }
             });
             charActionPanel.add(Skill);
 
@@ -256,10 +346,54 @@ class FightThree extends JPanel implements ActionListener {
             ultBtn.setPreferredSize(new Dimension(100, 35));
             ultBtn.addActionListener(e ->
             {
-                turnSystem.ActionChosen(c, monster, c.Ultimate);
-                HP();
-                MP();
-                showDialogue(c.getName(), "ULTIMATE");
+                if(c.name.equals("Quinn"))
+                {
+                    Character target = null;
+                    for(Character ally: characters)
+                    {
+                        if(ally != c)
+                        {
+                            target = ally;
+                            break;
+                        }
+                    }
+
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+
+                        int targetHPBefore = target.HP;
+
+                        turnSystem.ActionChosen(c, target, c.Ultimate);
+
+                        int healAmount = target.HP = targetHPBefore;
+                        HP();
+                        MP();
+                        showDialogue(c.getName(), "ULTIMATE");
+                        showBattleText(c.getName() + " healed " + healAmount + " HP!");
+                    } else if (c.HP <= 0) {
+                        showBattleText(c.getName() + " is down!");
+                    } else {
+                        showBattleText("Not enough MP!");
+                    }
+                }
+                else {
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+
+                        int monsterHPBefore = monster.HP;
+
+                        turnSystem.ActionChosen(c, monster, c.Ultimate);
+
+                        int damage = monsterHPBefore - monster.HP;
+
+                        HP();
+                        MP();
+                        showDialogue(c.getName(), "ULTIMATE");
+                        showBattleText("CRITICAL HIT! Finals Monster took " + damage + " damage!");
+                    } else if (c.HP <= 0) {
+                        showBattleText(c.getName() + " is down!");
+                    } else {
+                        showBattleText("Not enough MP!");
+                    }
+                }
             });
             charActionPanel.add(ultBtn);
 
@@ -370,7 +504,17 @@ class FightThree extends JPanel implements ActionListener {
         monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
         if (monster.HP <= 0) {
-            goToEnd();
+            monster.HP = 0;
+            monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
+
+            javax.swing.Timer delayTimer = new javax.swing.Timer(1000, new ActionListener() {
+                @Override
+                public  void actionPerformed(ActionEvent e) {
+                    goToEnd();
+                }
+            });
+            delayTimer.setRepeats(false);
+            delayTimer.start();
         }
     }
 

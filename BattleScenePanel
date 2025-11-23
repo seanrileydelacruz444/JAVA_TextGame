@@ -476,7 +476,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
             }
 
             String monsterSay = switch (action) {
-                case "ATTACK" -> "Ouch! That hurt! You're grades will go down with you!";
+                case "ATTACK" -> "Ouch! That hurt! Your grades will go down with you!";
                 case "SKILL" -> "I'm assigning you more homework!";
                 case "ULTIMATE" -> "I'm deducting participation points!";
                 default -> "";

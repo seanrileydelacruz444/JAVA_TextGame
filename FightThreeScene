@@ -497,14 +497,36 @@ class FightThree extends JPanel implements ActionListener {
     }
 
     private void HP() {
+        boolean allPlayersDead = true;
+
         for (int i = 0; i < characters.size(); i++) {
             Character c = characters.get(i);
             HPText[i].setText("HP: " + c.HP + "/" + c.maxHP);
+
+            if (c.HP > 0) {
+                allPlayersDead = false;  
+            }
         }
+
         monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
+        if (allPlayersDead) {
+
+            javax.swing.Timer delay = new javax.swing.Timer(1000, new ActionListener() {
+                @Override
+                public  void actionPerformed(ActionEvent e) {
+                    goToGameOver();
+                }
+            });
+
+            delay.start();
+            delay.setRepeats(false);
+
+            return;
+        }
+
+
         if (monster.HP <= 0) {
-            monster.HP = 0;
             monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
             javax.swing.Timer delayTimer = new javax.swing.Timer(1000, new ActionListener() {
@@ -513,8 +535,9 @@ class FightThree extends JPanel implements ActionListener {
                     goToEnd();
                 }
             });
-            delayTimer.setRepeats(false);
             delayTimer.start();
+            delayTimer.setRepeats(false);
+            return;
         }
     }
 
@@ -525,6 +548,15 @@ class FightThree extends JPanel implements ActionListener {
             Character c = characters.get(i);
             MPText[i].setText("MP: " + c.MP + "/" + c.maxMP);
         }
+    }
+
+   private void goToGameOver() {
+        battleTimer.stop();
+
+        GameOverPanel gameOverPanel = new GameOverPanel(frame);
+        frame.setContentPane(gameOverPanel);
+        frame.revalidate();
+        frame.repaint();
     }
 
 

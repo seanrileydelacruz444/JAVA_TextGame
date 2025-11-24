@@ -1,0 +1,385 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package game;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LayoutManager;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Scanner;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.border.Border;
+
+public class GUI {
+    public static void main(String[] args) {
+        new Scanner(System.in);
+        Character chosenCharacter = null;
+        Character otherChosenCharacter = null;
+        SwingUtilities.invokeLater(() -> (new GUI()).createAndShowGUI());
+    }
+
+    public void createAndShowGUI() {
+        JFrame frame = new JFrame();
+        frame.setSize(900, 600);
+        frame.setDefaultCloseOperation(3);
+        frame.getContentPane().setBackground(Color.black);
+        TitlePanel panel = new TitlePanel(frame);
+        frame.setLocationRelativeTo((Component)null);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+    }
+
+    class LoadingPanel extends JPanel implements ActionListener {
+        private Timer timer;
+        private Timer progressTimer;
+        private JFrame frame;
+        private int progress;
+        private int angle;
+
+        public LoadingPanel(JFrame frame) {
+            Objects.requireNonNull(GUI.this);
+            super();
+            this.progress = 0;
+            this.angle = 0;
+            this.frame = frame;
+            this.setLayout((LayoutManager)null);
+            this.setBackground(Color.BLACK);
+        }
+
+        public void startLoading() {
+            this.timer = new Timer(50, (e) -> {
+                this.angle = (this.angle + 5) % 360;
+                this.repaint();
+            });
+            this.timer.start();
+            this.progressTimer = new Timer(100, this);
+            this.progressTimer.start();
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+
+            for(int i = 0; i < 150; ++i) {
+                int x = (int)(Math.random() * (double)this.getWidth());
+                int y = (int)(Math.random() * (double)this.getHeight());
+                g.fillRect(x, y, 2, 2);
+            }
+
+            this.drawLoadingWheel(g);
+            g.setFont(new Font("Monospaced", 1, 30));
+            String loadingText = "Starting the semester... " + this.progress + "%";
+            int textWidth = g.getFontMetrics().stringWidth(loadingText);
+            int textX = (this.getWidth() - textWidth) / 2;
+            int textY = this.getHeight() / 2 + 100;
+            g.drawString(loadingText, textX, textY);
+            int barWidth = 300;
+            int barHeight = 20;
+            int barX = (this.getWidth() - barWidth) / 2;
+            int barY = this.getHeight() / 2 + 150;
+            g.drawRect(barX, barY, barWidth, barHeight);
+            g.fillRect(barX, barY, barWidth * this.progress / 100, barHeight);
+        }
+
+        private void drawLoadingWheel(Graphics g) {
+            int width = this.getWidth();
+            int height = this.getHeight();
+            int wheelSize = Math.min(width, height) / 3;
+            int x = width / 2 - wheelSize / 2;
+            int y = height / 3 - wheelSize / 2;
+            Graphics2D g2d = (Graphics2D)g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setColor(Color.WHITE);
+            g2d.setStroke(new BasicStroke(3.0F));
+            int innerDiameter = (int)((double)wheelSize * 0.8);
+            int outerRadius = wheelSize / 2;
+            int innerRadius = innerDiameter / 2;
+            int centerX = x + outerRadius;
+            int centerY = y + outerRadius;
+
+            for(int i = 0; i < 12; ++i) {
+                double startAngle = Math.toRadians((double)(i * 30 - this.angle));
+                double endAngle = Math.toRadians((double)(i * 30 + 60 - this.angle));
+                int startX = (int)((double)centerX + (double)outerRadius * Math.cos(startAngle));
+                int startY = (int)((double)centerY + (double)outerRadius * Math.sin(startAngle));
+                int endX = (int)((double)centerX + (double)innerRadius * Math.cos(endAngle));
+                int endY = (int)((double)centerY + (double)innerRadius * Math.sin(endAngle));
+                g2d.drawLine(startX, startY, endX, endY);
+            }
+
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            this.progress += 3;
+            if (this.progress >= 100) {
+                this.timer.stop();
+                this.progressTimer.stop();
+                BattlePanel gamePanel = new BattlePanel(this.frame);
+                this.frame.setContentPane(gamePanel);
+                this.frame.revalidate();
+                this.frame.repaint();
+            }
+
+            this.repaint();
+        }
+    }
+
+    class TitlePanel extends JPanel implements ActionListener {
+        private Timer timer;
+        private JButton startButton;
+        private JButton howToPlayButton;
+        private JButton quitButton;
+        private JFrame frame;
+        private final ArrayList<Point> stars;
+        private final ArrayList<Integer> starMovement;
+
+        public TitlePanel(JFrame frame) {
+            Objects.requireNonNull(GUI.this);
+            super();
+            this.stars = new ArrayList();
+            this.starMovement = new ArrayList();
+            this.frame = frame;
+            this.setLayout((LayoutManager)null);
+            this.setBackground(Color.BLACK);
+            this.generateStars(150);
+            this.startButton = this.createButton("START");
+            this.howToPlayButton = this.createButton("DESCRIPTION");
+            this.quitButton = this.createButton("QUIT");
+            this.add(this.startButton);
+            this.add(this.howToPlayButton);
+            this.add(this.quitButton);
+            this.addComponentListener(new ComponentAdapter() {
+                {
+                    Objects.requireNonNull(TitlePanel.this);
+                }
+
+                public void componentResized(ComponentEvent e) {
+                    TitlePanel.this.centerComponents();
+                }
+            });
+            this.startButton.addActionListener((e) -> {
+                LoadingPanel loadingPanel = GUI.this.new LoadingPanel(frame);
+                frame.setContentPane(loadingPanel);
+                frame.revalidate();
+                frame.repaint();
+                loadingPanel.startLoading();
+            });
+            this.howToPlayButton.addActionListener((e) -> this.goToHowToPlayPage());
+            this.quitButton.addActionListener((e) -> System.exit(0));
+            this.timer = new Timer(50, this);
+            this.timer.start();
+        }
+
+        private void generateStars(int count) {
+            Random ran = new Random();
+            this.stars.clear();
+            this.starMovement.clear();
+            int w = 900;
+            int h = 600;
+
+            for(int i = 0; i < count; ++i) {
+                this.stars.add(new Point(ran.nextInt(w), ran.nextInt(h)));
+                this.starMovement.add(1 + ran.nextInt(3));
+            }
+
+        }
+
+        private JButton createButton(String text) {
+            JButton button = new JButton(text);
+            button.setFocusPainted(false);
+            button.setFont(new Font("Monospaced", 1, 30));
+            button.setBackground(Color.BLACK);
+            button.setForeground(Color.WHITE);
+            button.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            button.setSize(300, 60);
+            return button;
+        }
+
+        private void centerComponents() {
+            int panelWidth = this.getWidth();
+            int panelHeight = this.getHeight();
+            int buttonWidth = this.startButton.getWidth();
+            int x = (panelWidth - buttonWidth) / 2;
+            int yStart = (panelHeight - 200) / 2;
+            this.startButton.setLocation(x, yStart);
+            this.howToPlayButton.setLocation(x, yStart + 80);
+            this.quitButton.setLocation(x, yStart + 160);
+        }
+
+        private void goToHowToPlayPage() {
+            HowToPlayPanel nextPage = GUI.this.new HowToPlayPanel(this.frame);
+            this.frame.setContentPane(nextPage);
+            this.frame.revalidate();
+            this.frame.repaint();
+            nextPage.requestFocusInWindow();
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+
+            for(Point p : this.stars) {
+                g.fillRect(p.x, p.y, 2, 2);
+            }
+
+            g.setFont(new Font("Monospaced", 1, 100));
+            FontMetrics fm = g.getFontMetrics();
+            String title = "C.O.U.R.S.E";
+            int x = (this.getWidth() - fm.stringWidth(title)) / 2;
+            int y = 150;
+            g.drawString(title, x, y);
+            this.centerComponents();
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            Random ran = new Random();
+
+            for(int i = 0; i < this.stars.size(); ++i) {
+                Point star = (Point)this.stars.get(i);
+                int movement = (Integer)this.starMovement.get(i);
+                star.y += movement;
+                if (star.y > this.getHeight()) {
+                    star.y = 0;
+                    star.x = ran.nextInt(this.getWidth());
+                }
+            }
+
+            this.repaint();
+        }
+    }
+
+    class HowToPlayPanel extends JPanel implements ActionListener {
+        private Timer timer;
+        private JButton backButton;
+        private JFrame frame;
+        private JLabel titleLabel;
+        private JTextArea textArea;
+        private JScrollPane scrollPane;
+        private final ArrayList<Point> stars;
+        private final ArrayList<Integer> starMovement;
+
+        public HowToPlayPanel(JFrame frame) {
+            Objects.requireNonNull(GUI.this);
+            super();
+            this.stars = new ArrayList();
+            this.starMovement = new ArrayList();
+            this.frame = frame;
+            this.setLayout((LayoutManager)null);
+            this.setBackground(Color.BLACK);
+            this.generateStars(150);
+            this.backButton = new JButton("BACK");
+            this.backButton.setFont(new Font("Monospaced", 1, 20));
+            this.backButton.setBackground(Color.BLACK);
+            this.backButton.setForeground(Color.WHITE);
+            this.backButton.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            this.backButton.setBounds(30, 30, 100, 40);
+            this.add(this.backButton);
+            this.backButton.addActionListener((e) -> {
+                TitlePanel mainPage = GUI.this.new TitlePanel(frame);
+                frame.setContentPane(mainPage);
+                frame.revalidate();
+                frame.repaint();
+                mainPage.requestFocusInWindow();
+            });
+            this.titleLabel = new JLabel("HOW TO PLAY", 0);
+            this.titleLabel.setFont(new Font("Monospaced", 1, 40));
+            this.titleLabel.setForeground(Color.WHITE);
+            this.add(this.titleLabel);
+            this.textArea = new JTextArea("C.O.U.R.S.E\n\nCollege Unified Role Playing Students Encounter\n\nDESCRIPTION\n\nA role-playing game where each course is represented by a student with unique skills, abilities, and personalities that mirror their field of study. Join their adventure as they face challenges in the world of college and battle their way through every semester.\n\nCHARACTERS\n\nChar 1: Dorothy (ARCHITECT) — HIGHEST DEFENSE\nSkill 1: T SQUARE – Uses a T square for offense.\nULTIMATE: SUCCESSFUL FLOOR PLAN – Summons a protective barrier.\n\nChar 2: Quinn (NURSING) — HIGHEST HP\nSkill 1: FIRST AID KIT – Heals a single ally.\nULTIMATE: SYRINGE REVIVE – Revives a downed ally.\n\nChar 3: Noah (I.T.) — HIGHEST ATTACK\nSkill 1: CELLPHONE – Fires electric byte strikes.\nULTIMATE: TRANSFORMATION – Boosts armor and power.\n\nChar 4: Darwin (ENGINEERING) — HIGHEST INTELLECT\nSkill 1: INFO DUMP – Reveals way too much info and confuses enemy, dealing INT damage.\nULTIMATE: HARD HATS – Provides safety gear to himself and reduces enemy defence.\n\nChar 5: Ace (PSYCHOLOGY) — HIGHEST WISDOM\nSkill 1: PSYCHOLOGY BOOK – Confuses enemies with knowledge.\nULTIMATE: EXISTENTIAL CRISIS – Heavy Mental attack.\n\n");
+            this.textArea.setFont(new Font("Monospaced", 0, 16));
+            this.textArea.setForeground(Color.WHITE);
+            this.textArea.setBackground(Color.BLACK);
+            this.textArea.setEditable(false);
+            this.textArea.setLineWrap(true);
+            this.textArea.setWrapStyleWord(true);
+            this.scrollPane = new JScrollPane(this.textArea);
+            this.scrollPane.setBorder((Border)null);
+            this.scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+            this.add(this.scrollPane);
+            this.addComponentListener(new ComponentAdapter() {
+                {
+                    Objects.requireNonNull(HowToPlayPanel.this);
+                }
+
+                public void componentResized(ComponentEvent e) {
+                    HowToPlayPanel.this.centerContent();
+                }
+            });
+            this.timer = new Timer(50, this);
+            this.timer.start();
+        }
+
+        private void generateStars(int count) {
+            Random ran = new Random();
+            this.stars.clear();
+            this.starMovement.clear();
+            int w = 900;
+            int h = 600;
+
+            for(int i = 0; i < count; ++i) {
+                this.stars.add(new Point(ran.nextInt(w), ran.nextInt(h)));
+                this.starMovement.add(1 + ran.nextInt(3));
+            }
+
+        }
+
+        private void centerContent() {
+            int panelWidth = this.getWidth();
+            int panelHeight = this.getHeight();
+            int textWidth = panelWidth - 200;
+            int textHeight = panelHeight - 200;
+            this.titleLabel.setBounds(0, 100, panelWidth, 50);
+            this.scrollPane.setBounds((panelWidth - textWidth) / 2, 180, textWidth, textHeight);
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.WHITE);
+
+            for(Point p : this.stars) {
+                g.fillRect(p.x, p.y, 2, 2);
+            }
+
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            Random ran = new Random();
+
+            for(int i = 0; i < this.stars.size(); ++i) {
+                Point star = (Point)this.stars.get(i);
+                int movement = (Integer)this.starMovement.get(i);
+                star.y += movement;
+                if (star.y > this.getHeight()) {
+                    star.y = 0;
+                    star.x = ran.nextInt(this.getWidth());
+                }
+            }
+
+            this.repaint();
+        }
+    }
+}

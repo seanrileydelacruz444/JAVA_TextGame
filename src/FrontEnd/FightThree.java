@@ -234,7 +234,7 @@ class FightThree extends JPanel implements ActionListener {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        String path = "C:\\Users\\User\\Downloads\\GUI 3\\GUI 3\\GUI\\images\\HomeworkMonsterThree.png";
+        String path = "C:/Users/User/CODE_JAVA/GUI 3 - Final/GUI 3/GUI/images/HomeworkMonsterThree.png";
 
         ImageIcon icon = new ImageIcon(path);
         Image scaled = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
@@ -303,15 +303,13 @@ class FightThree extends JPanel implements ActionListener {
                         }
                     }
 
-                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
-
-                        int targetHPBefore = target.HP;
-
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0)
+                    {
                         turnSystem.ActionChosen(c, target, c.skill1);
                         HP();
                         MP();
+
                         showDialogue(c.getName(), "SKILL");
-                        showBattleText(c.getName() + " is down!");
                     } else if (c.HP <= 0) {
                         showBattleText(c.getName() + " is down!");
                     } else {
@@ -358,16 +356,16 @@ class FightThree extends JPanel implements ActionListener {
                         }
                     }
 
-                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
-
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0)
+                    {
                         int targetHPBefore = target.HP;
+                        turnSystem.ActionChosen(c, target, c.skill1);
+                        int healAmount = target.HP - targetHPBefore;
 
-                        turnSystem.ActionChosen(c, target, c.Ultimate);
-
-                        int healAmount = target.HP = targetHPBefore;
                         HP();
                         MP();
-                        showDialogue(c.getName(), "ULTIMATE");
+
+                        showDialogue(c.getName(), "SKILL");
                         showBattleText(c.getName() + " healed " + healAmount + " HP!");
                     } else if (c.HP <= 0) {
                         showBattleText(c.getName() + " is down!");
@@ -409,7 +407,7 @@ class FightThree extends JPanel implements ActionListener {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 
-        String path = "C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\" + characterName.toLowerCase() + ".png";
+        String path = "C:/Users/User/CODE_JAVA/GUI 3 - Final/GUI 3/GUI/images/" + characterName.toLowerCase() + ".png";
         ImageIcon icon = new ImageIcon(path);
         if (icon.getIconWidth() > 0)
         {

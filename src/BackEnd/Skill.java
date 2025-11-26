@@ -4,7 +4,7 @@ public abstract class Skill
 {
     public final String name;
     int MPcost;
-    
+
     public Skill(String name, int MpCost)
     {
         this.name = name;
@@ -72,7 +72,7 @@ public abstract class Skill
                 return;
             }
 
-            int damage = user.ATK - (target.DEF / 2); // ignore enemy defense
+            int damage = user.ATK - (target.DEF / 2);
             takeDamage(target, damage);
             user.MP -= MPcost;
         }

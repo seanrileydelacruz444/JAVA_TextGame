@@ -18,8 +18,6 @@ public abstract class Skill
             System.out.println(user.name + " is down!");
             return;
         }
-
-        System.out.println(user.name + " used " + user.name + " on " + target.name);
     }
 
     //ATTACK

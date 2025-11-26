@@ -4,7 +4,7 @@ public abstract class Skill
 {
     public final String name;
     int MPcost;
-
+    
     public Skill(String name, int MpCost)
     {
         this.name = name;

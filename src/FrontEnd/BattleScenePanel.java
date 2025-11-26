@@ -51,7 +51,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
     }
 
     private void setupBattleUI() {
-      
+        // Top panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -234,7 +234,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        String path = "C:\\Users\\User\\Downloads\\GUI 3\\GUI 3\\GUI\\images\\HomeworkMonster.png";
+        String path = "C:/Users/User/CODE_JAVA/GUI 3 - Final/GUI 3/GUI/images/HomeworkMonster.png";
 
         ImageIcon icon = new ImageIcon(path);
         Image scaled = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
@@ -243,6 +243,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
         return imageLabel;
     }
 
+    //ang new buttons
     private JPanel createActionPanel()
     {
         JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
@@ -302,15 +303,17 @@ class BattleScenePanel extends JPanel implements ActionListener {
                         }
                     }
 
-                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
-
+                    if (c.MP >= c.skill1.MPcost && c.HP > 0)
+                    {
                         int targetHPBefore = target.HP;
-
                         turnSystem.ActionChosen(c, target, c.skill1);
+                        int healAmount = target.HP - targetHPBefore;
+
                         HP();
                         MP();
+
                         showDialogue(c.getName(), "SKILL");
-                        showBattleText(c.getName() + " is down!");
+                        showBattleText(c.getName() + " healed " + healAmount + " HP!");
                     } else if (c.HP <= 0) {
                         showBattleText(c.getName() + " is down!");
                     } else {
@@ -356,10 +359,14 @@ class BattleScenePanel extends JPanel implements ActionListener {
                             break;
                         }
                     }
-                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+
+                    if (c.MP >= c.Ultimate.MPcost && c.HP > 0) {
+
                         int targetHPBefore = target.HP;
+
                         turnSystem.ActionChosen(c, target, c.Ultimate);
-                        int healAmount = target.HP = targetHPBefore;
+
+                        int healAmount = target.HP - targetHPBefore;
                         HP();
                         MP();
                         showDialogue(c.getName(), "ULTIMATE");
@@ -371,10 +378,12 @@ class BattleScenePanel extends JPanel implements ActionListener {
                     }
                 }
                 else {
-                    if (c.MP >= c.skill1.MPcost && c.HP > 0) {
+                    if (c.MP >= c.Ultimate.MPcost && c.HP > 0) {
 
                         int monsterHPBefore = monster.HP;
+
                         turnSystem.ActionChosen(c, monster, c.Ultimate);
+
                         int damage = monsterHPBefore - monster.HP;
 
                         HP();
@@ -402,7 +411,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imageLabel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 
-        String path = "C:\\Users\\User\\OneDrive\\Desktop\\GUI\\GUI\\images\\" + characterName.toLowerCase() + ".png";
+        String path = "C:/Users/User/CODE_JAVA/GUI 3 - Final/GUI 3/GUI/images/" + characterName.toLowerCase() + ".png";
         ImageIcon icon = new ImageIcon(path);
         if (icon.getIconWidth() > 0)
         {
@@ -497,9 +506,10 @@ class BattleScenePanel extends JPanel implements ActionListener {
             HPText[i].setText("HP: " + c.HP + "/" + c.maxHP);
 
             if (c.HP > 0) {
-                allPlayersDead = false;
+                allPlayersDead = false;  // At least one player is alive
             }
         }
+
         monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
         if (allPlayersDead) {
@@ -515,6 +525,7 @@ class BattleScenePanel extends JPanel implements ActionListener {
             delay.setRepeats(false);
             return;
         }
+
         if (monster.HP <= 0) {
             monsterHPLabel.setText("HP: " + monster.HP + "/" + monster.maxHP);
 
@@ -528,7 +539,10 @@ class BattleScenePanel extends JPanel implements ActionListener {
             delayTimer.setRepeats(false);
             return;
         }
+
+        // Check if all players are dead (game over)
         if (turnSystem.hasEnded()) {
+
             battleTimer.stop();
         }
     }
